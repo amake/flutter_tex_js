@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_tex_js/flutter_tex_js.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
   @override
@@ -14,32 +9,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  TextEditingController _textEditingController;
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    _textEditingController =
+        TextEditingController(text: r'a=\pm\sqrt{b^2+c^2}');
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await FlutterTexJs.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
   }
 
   @override
@@ -47,10 +29,30 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Flutter TeX JS Example'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                TextField(controller: _textEditingController),
+                const SizedBox(height: 8),
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _textEditingController,
+                  builder: (context, value, child) {
+                    return TexImage(value.text);
+                  },
+                ),
+                const SizedBox(height: 8),
+                Builder(
+                  builder: (context) =>
+                      Text('${MediaQuery.of(context).devicePixelRatio}x'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
