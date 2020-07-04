@@ -11,11 +11,25 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Flutter TeX JS Example'),
+      home: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Flutter TeX JS Example'),
+            bottom: const TabBar(
+              tabs: [
+                Tab(child: Text('Edit')),
+                Tab(child: Text('∞')),
+              ],
+            ),
+          ),
+          body: const TabBarView(
+            children: [
+              EditableExample(),
+              InfiniteExample(),
+            ],
+          ),
         ),
-        body: const EditableExample(),
       ),
     );
   }
@@ -79,6 +93,19 @@ class _EditableExampleState extends State<EditableExample> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class InfiniteExample extends StatelessWidget {
+  const InfiniteExample({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemBuilder: (context, i) => Center(
+        child: TexImage('\\sqrt[$i]{a^2 + b^2}'),
       ),
     );
   }
