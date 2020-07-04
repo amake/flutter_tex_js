@@ -91,6 +91,10 @@ class _EditableExampleState extends State<EditableExample> {
                 );
               },
             ),
+            const Text(
+              'fin',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            )
           ],
         ),
       ),
