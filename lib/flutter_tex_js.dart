@@ -56,12 +56,18 @@ class TexImage extends StatelessWidget {
             scale: MediaQuery.of(context).devicePixelRatio,
           );
         } else if (snapshot.hasError) {
-          return Column(
-            children: [
-              const Icon(Icons.error),
-              Text(snapshot.error.toString()),
-            ],
-          );
+          final error = snapshot.error;
+          if (error is PlatformException &&
+              error.code == 'UnsupportedOsVersion') {
+            return Text(math);
+          } else {
+            return Column(
+              children: [
+                const Icon(Icons.error),
+                Text(error.toString()),
+              ],
+            );
+          }
         } else {
           return placeholder ?? Text(math);
         }

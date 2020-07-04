@@ -8,6 +8,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 
+    @available(iOS 11.0, *)
     lazy var renderer = TexRenderer()
 
     let queue = DispatchQueue(label: "TexJsRenderQueue", qos: .userInteractive, attributes: .concurrent)
@@ -16,12 +17,17 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "render":
-            handleRender(call, result)
+            if #available(iOS 11.0, *) {
+                handleRender(call, result)
+            } else {
+                result(FlutterError(code: "UnsupportedOsVersion", message: "iOS 11+ is required", details: nil))
+            }
         default:
             result(FlutterError(code: "UnsupportedMethod", message: "\(call.method) is not supported", details: nil))
         }
     }
 
+    @available(iOS 11.0, *)
     func handleRender(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String:Any?] else {
             result(FlutterError(code: "MissingArgs", message: "Required arguments missing", details: "\(call.method) requires 'text', 'displayMode', 'color'"))

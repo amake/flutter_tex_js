@@ -16,7 +16,7 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.resource_bundle = { 'flutter_tex_js_katex' => 'Assets/katex/**/*.{min.js,min.css,woff2}' }
   s.dependency 'Flutter'
-  s.platform = :ios, '11.0'
+  s.platform = :ios, '8.0'
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
