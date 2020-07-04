@@ -66,6 +66,7 @@ enum TexError : Error {
     case engineError(message: String)
     case executionError
     case pngConversion
+    case concurrentRequest
 }
 
 class TexRenderer : NSObject, WKScriptMessageHandler {
@@ -116,6 +117,10 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
     }
 
     func render(_ math: String, displayMode: Bool, color: String, completionHandler: @escaping (Data?, Error?) -> Void) {
+        guard resultListener == nil else {
+            completionHandler(nil, TexError.concurrentRequest)
+            return
+        }
         let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
         let js = "setColor('\(color)'); render('\(escapedMath)', \(displayMode))"
         resultListener = completionHandler

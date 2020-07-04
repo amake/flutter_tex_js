@@ -10,6 +10,9 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
 
     lazy var renderer = TexRenderer()
 
+    let queue = DispatchQueue(label: "TexJsRenderQueue", qos: .userInteractive, attributes: .concurrent)
+    let semaphore = DispatchSemaphore(value: 1)
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "render":
@@ -36,13 +39,20 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'color'"))
             return
         }
-        renderer.whenReady { renderer in
-            renderer.render(text, displayMode: displayMode, color: color) { data, error in
-                guard let data = data else {
-                    result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
-                    return
+        queue.async {
+            self.semaphore.wait()
+            // WebView init has to be done on UI thread
+            DispatchQueue.main.async {
+                self.renderer.whenReady { renderer in
+                    renderer.render(text, displayMode: displayMode, color: color) { data, error in
+                        self.semaphore.signal()
+                        guard let data = data else {
+                            result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
+                            return
+                        }
+                        result(FlutterStandardTypedData(bytes: data))
+                    }
                 }
-                result(FlutterStandardTypedData(bytes: data))
             }
         }
     }
