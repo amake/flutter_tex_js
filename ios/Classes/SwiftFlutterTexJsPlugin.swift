@@ -31,7 +31,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
         renderer.whenReady { renderer in
             renderer.render(text) { data, error in
                 guard let data = data else {
-                    result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: String(describing: error)))
+                    result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
                     return
                 }
                 result(FlutterStandardTypedData(bytes: data))
