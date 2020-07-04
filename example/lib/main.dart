@@ -10,6 +10,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   TextEditingController _textEditingController;
+  bool _displayMode;
 
   @override
   void initState() {
@@ -17,6 +18,7 @@ class _MyAppState extends State<MyApp> {
     _textEditingController = TextEditingController(
       text: r'a=\pm\sqrt{b^2+c^2} \int_\infty^\beta d\gamma',
     );
+    _displayMode = true;
   }
 
   @override
@@ -45,10 +47,19 @@ class _MyAppState extends State<MyApp> {
                       'Resolution: ${MediaQuery.of(context).devicePixelRatio}x'),
                 ),
                 const SizedBox(height: 8),
+                CheckboxListTile(
+                  value: _displayMode,
+                  onChanged: (value) => setState(() => _displayMode = value),
+                  title: const Text('Display mode'),
+                ),
+                const SizedBox(height: 8),
                 ValueListenableBuilder<TextEditingValue>(
                   valueListenable: _textEditingController,
                   builder: (context, value, child) {
-                    return TexImage(value.text);
+                    return TexImage(
+                      value.text,
+                      displayMode: _displayMode,
+                    );
                   },
                 ),
               ],

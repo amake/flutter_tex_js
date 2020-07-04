@@ -21,15 +21,19 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
 
     func handleRender(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String:Any?] else {
-            result(FlutterError(code: "MissingArgs", message: "Required arguments missing", details: "\(call.method) requires 'text'"))
+            result(FlutterError(code: "MissingArgs", message: "Required arguments missing", details: "\(call.method) requires 'text', 'displayMode'"))
             return
         }
         guard let text = args["text"] as? String else {
             result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'text'"))
             return
         }
+        guard let displayMode = args["displayMode"] as? Bool else {
+            result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'displayMode'"))
+            return
+        }
         renderer.whenReady { renderer in
-            renderer.render(text) { data, error in
+            renderer.render(text, displayMode: displayMode) { data, error in
                 guard let data = data else {
                     result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
                     return

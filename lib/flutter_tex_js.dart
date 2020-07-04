@@ -7,21 +7,37 @@ import 'package:flutter/services.dart';
 class FlutterTexJs {
   static const MethodChannel _channel = MethodChannel('flutter_tex_js');
 
-  static Future<Uint8List> render(String text) async =>
-      _channel.invokeMethod<Uint8List>('render', {'text': text});
+  static Future<Uint8List> render(
+    String text, {
+    @required bool displayMode,
+  }) async {
+    assert(displayMode != null);
+    return _channel.invokeMethod<Uint8List>('render', {
+      'text': text,
+      'displayMode': displayMode,
+    });
+  }
 }
 
 class TexImage extends StatelessWidget {
-  const TexImage(this.math, {Key key})
-      : assert(math != null),
+  const TexImage(
+    this.math, {
+    this.displayMode = true,
+    Key key,
+  })  : assert(math != null),
+        assert(displayMode != null),
         super(key: key);
 
   final String math;
+  final bool displayMode;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Uint8List>(
-      future: FlutterTexJs.render(math),
+      future: FlutterTexJs.render(
+        math,
+        displayMode: displayMode,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Image.memory(

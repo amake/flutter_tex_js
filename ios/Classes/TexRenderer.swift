@@ -29,9 +29,12 @@ fileprivate let html = """
    function getMathElement() {
        return document.getElementById('math');
    }
-   function render(math) {
+   function render(math, displayMode) {
        try {
-           katex.render(math, getMathElement(), { output: 'html' });
+           katex.render(math, getMathElement(), {
+               output: 'html',
+               displayMode: displayMode
+           });
            sendBounds();
            return true;
        } catch (error) {
@@ -109,10 +112,10 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         }
     }
 
-    func render(_ math: String, completionHandler: @escaping (Data?, Error?) -> Void) {
+    func render(_ math: String, displayMode: Bool, completionHandler: @escaping (Data?, Error?) -> Void) {
         let escaped = math.replacingOccurrences(of: "\\", with: "\\\\")
         resultListener = completionHandler
-        webView.evaluateJavaScript("render('\(escaped)')") { result, error in
+        webView.evaluateJavaScript("render('\(escaped)', \(displayMode))") { result, error in
             if result as? Bool == true {
                 // Success
                 return
