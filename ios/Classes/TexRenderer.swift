@@ -126,7 +126,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
         let js = "setColor('\(color)'); render('\(escapedMath)', \(displayMode))"
         resultListener = completionHandler
-        webView.evaluateJavaScript(js) { result, error in
+        webView.evaluateJavaScript(js) { [weak self] result, error in
             if result as? Bool == true {
                 // Success
                 return
@@ -137,7 +137,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
             } else {
                 completionHandler(nil, TexError.executionError)
             }
-            self.resultListener = nil
+            self?.resultListener = nil
         }
     }
 
@@ -152,7 +152,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         if #available(iOS 13.0, *) {
             snapConfig.afterScreenUpdates = true
         }
-        self.webView.takeSnapshot(with: snapConfig) { image, error in
+        webView.takeSnapshot(with: snapConfig) { image, error in
             guard let image = image else {
                 completionHandler(nil, error)
                 return
