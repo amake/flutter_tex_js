@@ -50,6 +50,11 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'color'"))
             return
         }
+        guard let maxWidth = args["maxWidth"] as? Double else {
+            result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'maxWidth'"))
+            return
+        }
+
         let queued = NSDate().timeIntervalSinceReferenceDate * 1000
 
         // Set up job; see
@@ -61,6 +66,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             job = nil
             self?.jobs[requestId] = nil
             self?.semaphore.signal()
+            debugPrint("Remaining jobs: \(self?.jobs.count ?? -1)")
         }
 
         let isCancelled = { () -> Bool in
@@ -83,7 +89,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
                 self?.renderer.whenReady { renderer in
                     guard !isCancelled() else { return }
                     let start = NSDate().timeIntervalSinceReferenceDate * 1000
-                    renderer.render(text, displayMode: displayMode, color: color) { data, error in
+                    renderer.render(text, displayMode: displayMode, color: color, maxWidth: maxWidth) { data, error in
                         let end = NSDate().timeIntervalSinceReferenceDate * 1000
                         debugPrint("Rendering \(text) took \(Int(end - queued)) ms (\(Int(end - start)) rendering; \(Int(start - queued)) queued)")
                         if let data = data {

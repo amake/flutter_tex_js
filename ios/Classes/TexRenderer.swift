@@ -45,6 +45,9 @@ fileprivate let html = """
    function setColor(color) {
        getMathElement().style.color = color;
    }
+   function setNoWrap(noWrap) {
+       getMathElement().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
+   }
    function sendBounds() {
        const bounds = getMathElement().getBoundingClientRect().toJSON();
        window.webkit.messageHandlers.result.postMessage(bounds);
@@ -77,13 +80,13 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
     var ready = false
     var readyListener : ((TexRenderer) -> Void)?
     var resultListener : ((Data?, Error?) -> Void)?
-    
+
     private func initWebView() -> WKWebView {
         let controller = WKUserContentController()
         controller.add(self, name: "ready")
         controller.add(self, name: "result")
         controller.add(self, name: "debug")
-        
+
         let config = WKWebViewConfiguration()
         config.userContentController = controller
 
@@ -91,7 +94,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         webView.isOpaque = false
         return webView
     }
-    
+
     func whenReady(_ completionHandler: @escaping (TexRenderer) -> Void) {
         if ready {
             completionHandler(self)
@@ -100,7 +103,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
             webView.loadHTMLString(html, baseURL: assetsUrl)
         }
     }
-    
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         switch message.name {
         case "ready":
@@ -118,13 +121,15 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         }
     }
 
-    func render(_ math: String, displayMode: Bool, color: String, completionHandler: @escaping (Data?, Error?) -> Void) {
+    func render(_ math: String, displayMode: Bool, color: String, maxWidth: Double, completionHandler: @escaping (Data?, Error?) -> Void) {
         guard resultListener == nil else {
             completionHandler(nil, TexError.concurrentRequest)
             return
         }
+        setFrameWidth(maxWidth)
         let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
-        let js = "setColor('\(color)'); render('\(escapedMath)', \(displayMode))"
+        let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); render('\(escapedMath)', \(displayMode));"
+        debugPrint("JavaScript: \(js)")
         resultListener = completionHandler
         webView.evaluateJavaScript(js) { [weak self] result, error in
             if result as? Bool == true {
@@ -138,6 +143,15 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
                 completionHandler(nil, TexError.executionError)
             }
             self?.resultListener = nil
+        }
+    }
+
+    private func setFrameWidth(_ newWidth: Double) {
+        let frameWidth = newWidth.isFinite ? newWidth : Double(UIScreen.main.bounds.width)
+        let newFrame = CGRect(x: 0, y: 0, width: Int(frameWidth.rounded(.down)), height: Int(webView.frame.height))
+        if webView.frame != newFrame {
+            debugPrint("New frame width: \(frameWidth); was \(webView.frame.width)")
+            webView.frame = newFrame
         }
     }
 

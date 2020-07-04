@@ -12,15 +12,18 @@ class FlutterTexJs {
     @required String requestId,
     @required bool displayMode,
     @required Color color,
+    @required double maxWidth,
   }) async {
     assert(requestId != null);
     assert(displayMode != null);
     assert(color != null);
+    assert(maxWidth != null);
     return _channel.invokeMethod<Uint8List>('render', {
       'requestId': requestId,
       'text': text,
       'displayMode': displayMode,
       'color': _colorToCss(color),
+      'maxWidth': maxWidth,
     });
   }
 }
@@ -46,25 +49,28 @@ class TexImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Uint8List>(
-      future: FlutterTexJs.render(
-        math,
-        requestId: identityHashCode(this).toString(),
-        displayMode: displayMode,
-        color: color ?? DefaultTextStyle.of(context).style.color,
+    return LayoutBuilder(
+      builder: (context, constraints) => FutureBuilder<Uint8List>(
+        future: FlutterTexJs.render(
+          math,
+          requestId: identityHashCode(this).toString(),
+          displayMode: displayMode,
+          color: color ?? DefaultTextStyle.of(context).style.color,
+          maxWidth: constraints.maxWidth,
+        ),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Image.memory(
+              snapshot.data,
+              scale: MediaQuery.of(context).devicePixelRatio,
+            );
+          } else if (snapshot.hasError) {
+            return _buildErrorWidget(snapshot.error);
+          } else {
+            return placeholder ?? Text(math);
+          }
+        },
       ),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Image.memory(
-            snapshot.data,
-            scale: MediaQuery.of(context).devicePixelRatio,
-          );
-        } else if (snapshot.hasError) {
-          return _buildErrorWidget(snapshot.error);
-        } else {
-          return placeholder ?? Text(math);
-        }
-      },
     );
   }
 

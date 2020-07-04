@@ -91,6 +91,19 @@ class _EditableExampleState extends State<EditableExample> {
                 );
               },
             ),
+            const SizedBox(height: 8),
+            const Text('Horizontal scroll'),
+            const SizedBox(height: 8),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _textEditingController,
+              builder: (context, value, child) => SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: TexImage(
+                  [value.text, value.text, value.text].join(' '),
+                  displayMode: _displayMode,
+                ),
+              ),
+            ),
             const Text(
               'fin',
               style: TextStyle(fontStyle: FontStyle.italic),
@@ -109,7 +122,11 @@ class InfiniteExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       itemBuilder: (context, i) => Center(
-        child: TexImage('\\sqrt[$i]{a^2 + b^2}'),
+        child: TexImage(
+          '\\sqrt[$i]{a^2 + b^2} = ' * 5,
+          // No line wrap in displayMode
+          displayMode: false,
+        ),
       ),
     );
   }
