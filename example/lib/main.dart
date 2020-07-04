@@ -14,8 +14,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _textEditingController =
-        TextEditingController(text: r'a=\pm\sqrt{b^2+c^2}');
+    _textEditingController = TextEditingController(
+      text: r'a=\pm\sqrt{b^2+c^2} \int_\infty^\beta d\gamma',
+    );
   }
 
   @override
