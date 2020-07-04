@@ -40,16 +40,16 @@ class _MyAppState extends State<MyApp> {
               children: [
                 TextField(controller: _textEditingController),
                 const SizedBox(height: 8),
+                Builder(
+                  builder: (context) => Text(
+                      'Resolution: ${MediaQuery.of(context).devicePixelRatio}x'),
+                ),
+                const SizedBox(height: 8),
                 ValueListenableBuilder<TextEditingValue>(
                   valueListenable: _textEditingController,
                   builder: (context, value, child) {
                     return TexImage(value.text);
                   },
-                ),
-                const SizedBox(height: 8),
-                Builder(
-                  builder: (context) =>
-                      Text('${MediaQuery.of(context).devicePixelRatio}x'),
                 ),
               ],
             ),
