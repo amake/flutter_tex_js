@@ -9,12 +9,15 @@ class FlutterTexJs {
 
   static Future<Uint8List> render(
     String text, {
+    @required String requestId,
     @required bool displayMode,
     @required Color color,
   }) async {
+    assert(requestId != null);
     assert(displayMode != null);
     assert(color != null);
     return _channel.invokeMethod<Uint8List>('render', {
+      'requestId': requestId,
       'text': text,
       'displayMode': displayMode,
       'color': _colorToCss(color),
@@ -46,6 +49,7 @@ class TexImage extends StatelessWidget {
     return FutureBuilder<Uint8List>(
       future: FlutterTexJs.render(
         math,
+        requestId: identityHashCode(this).toString(),
         displayMode: displayMode,
         color: color ?? DefaultTextStyle.of(context).style.color,
       ),
@@ -56,22 +60,28 @@ class TexImage extends StatelessWidget {
             scale: MediaQuery.of(context).devicePixelRatio,
           );
         } else if (snapshot.hasError) {
-          final error = snapshot.error;
-          if (error is PlatformException &&
-              error.code == 'UnsupportedOsVersion') {
-            return Text(math);
-          } else {
-            return Column(
-              children: [
-                const Icon(Icons.error),
-                Text(error.toString()),
-              ],
-            );
-          }
+          return _buildErrorWidget(snapshot.error);
         } else {
           return placeholder ?? Text(math);
         }
       },
+    );
+  }
+
+  Widget _buildErrorWidget(Object error) {
+    if (error is PlatformException) {
+      switch (error.code) {
+        case 'UnsupportedOsVersion':
+          return Text(math);
+        case 'JobCancelled':
+          return const SizedBox.shrink();
+      }
+    }
+    return Column(
+      children: [
+        const Icon(Icons.error),
+        Text(error.toString()),
+      ],
     );
   }
 }
