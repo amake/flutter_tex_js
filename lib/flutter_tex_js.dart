@@ -30,6 +30,7 @@ class TexImage extends StatelessWidget {
     this.math, {
     this.displayMode = true,
     this.color,
+    this.placeholder,
     Key key,
   })  : assert(math != null),
         assert(displayMode != null),
@@ -38,6 +39,7 @@ class TexImage extends StatelessWidget {
   final String math;
   final bool displayMode;
   final Color color;
+  final Widget placeholder;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +63,7 @@ class TexImage extends StatelessWidget {
             ],
           );
         } else {
-          return const CircularProgressIndicator();
+          return placeholder ?? Text(math);
         }
       },
     );
