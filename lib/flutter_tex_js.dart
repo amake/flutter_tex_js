@@ -10,19 +10,26 @@ class FlutterTexJs {
   static Future<Uint8List> render(
     String text, {
     @required bool displayMode,
+    @required Color color,
   }) async {
     assert(displayMode != null);
+    assert(color != null);
     return _channel.invokeMethod<Uint8List>('render', {
       'text': text,
       'displayMode': displayMode,
+      'color': _colorToCss(color),
     });
   }
 }
+
+String _colorToCss(Color color) =>
+    'rgba(${color.red},${color.green},${color.blue},${color.opacity})';
 
 class TexImage extends StatelessWidget {
   const TexImage(
     this.math, {
     this.displayMode = true,
+    this.color,
     Key key,
   })  : assert(math != null),
         assert(displayMode != null),
@@ -30,6 +37,7 @@ class TexImage extends StatelessWidget {
 
   final String math;
   final bool displayMode;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +45,7 @@ class TexImage extends StatelessWidget {
       future: FlutterTexJs.render(
         math,
         displayMode: displayMode,
+        color: color ?? DefaultTextStyle.of(context).style.color,
       ),
       builder: (context, snapshot) {
         if (snapshot.hasData) {

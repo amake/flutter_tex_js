@@ -41,6 +41,9 @@ fileprivate let html = """
            return error.toString();
        }
    }
+   function setColor(color) {
+       getMathElement().style.color = color;
+   }
    function sendBounds() {
        const bounds = getMathElement().getBoundingClientRect().toJSON();
        window.webkit.messageHandlers.result.postMessage(bounds);
@@ -112,10 +115,11 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         }
     }
 
-    func render(_ math: String, displayMode: Bool, completionHandler: @escaping (Data?, Error?) -> Void) {
-        let escaped = math.replacingOccurrences(of: "\\", with: "\\\\")
+    func render(_ math: String, displayMode: Bool, color: String, completionHandler: @escaping (Data?, Error?) -> Void) {
+        let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
+        let js = "setColor('\(color)'); render('\(escapedMath)', \(displayMode))"
         resultListener = completionHandler
-        webView.evaluateJavaScript("render('\(escaped)', \(displayMode))") { result, error in
+        webView.evaluateJavaScript(js) { result, error in
             if result as? Bool == true {
                 // Success
                 return
