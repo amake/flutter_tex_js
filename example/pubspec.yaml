@@ -13,6 +13,8 @@ dependencies:
   flutter_tex_js:
     path: ../
 
+  flutter_tex: ^3.6.7+5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tex_js/flutter_tex_js.dart';
+import 'package:flutter_tex_js_example/flutter_tex.dart';
 
 void main() => runApp(const MyApp());
+
+const _tabs = [
+  Tab(child: Text('Edit')),
+  Tab(child: Text('∞')),
+  Tab(child: Text('Flutter TeX')),
+];
 
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
@@ -12,21 +19,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       home: DefaultTabController(
-        length: 2,
+        length: _tabs.length,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Flutter TeX JS Example'),
             bottom: const TabBar(
-              tabs: [
-                Tab(child: Text('Edit')),
-                Tab(child: Text('∞')),
-              ],
+              tabs: _tabs,
             ),
           ),
           body: const TabBarView(
             children: [
               EditableExample(),
               InfiniteExample(),
+              FlutterTexExample(),
             ],
           ),
         ),
