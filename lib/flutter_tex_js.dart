@@ -31,12 +31,13 @@ class FlutterTexJs {
 String _colorToCss(Color color) =>
     'rgba(${color.red},${color.green},${color.blue},${color.opacity})';
 
-class TexImage extends StatelessWidget {
+class TexImage extends StatefulWidget {
   const TexImage(
     this.math, {
     this.displayMode = true,
     this.color,
     this.placeholder,
+    this.keepAlive = true,
     Key key,
   })  : assert(math != null),
         assert(displayMode != null),
@@ -46,16 +47,24 @@ class TexImage extends StatelessWidget {
   final bool displayMode;
   final Color color;
   final Widget placeholder;
+  final bool keepAlive;
 
   @override
+  _TexImageState createState() => _TexImageState();
+}
+
+class _TexImageState extends State<TexImage>
+    with AutomaticKeepAliveClientMixin<TexImage> {
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return LayoutBuilder(
       builder: (context, constraints) => FutureBuilder<Uint8List>(
         future: FlutterTexJs.render(
-          math,
+          widget.math,
           requestId: identityHashCode(this).toString(),
-          displayMode: displayMode,
-          color: color ?? DefaultTextStyle.of(context).style.color,
+          displayMode: widget.displayMode,
+          color: widget.color ?? DefaultTextStyle.of(context).style.color,
           maxWidth: constraints.maxWidth,
         ),
         builder: (context, snapshot) {
@@ -67,7 +76,7 @@ class TexImage extends StatelessWidget {
           } else if (snapshot.hasError) {
             return _buildErrorWidget(snapshot.error);
           } else {
-            return placeholder ?? Text(math);
+            return widget.placeholder ?? Text(widget.math);
           }
         },
       ),
@@ -78,7 +87,7 @@ class TexImage extends StatelessWidget {
     if (error is PlatformException) {
       switch (error.code) {
         case 'UnsupportedOsVersion':
-          return Text(math);
+          return Text(widget.math);
         case 'JobCancelled':
           return const SizedBox.shrink();
       }
@@ -90,4 +99,7 @@ class TexImage extends StatelessWidget {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => widget.keepAlive;
 }
