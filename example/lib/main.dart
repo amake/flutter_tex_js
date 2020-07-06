@@ -71,8 +71,7 @@ class _EditableExampleState extends State<EditableExample> {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: ListView(
           children: [
             TextField(controller: _textEditingController),
             const SizedBox(height: 8),
@@ -90,14 +89,19 @@ class _EditableExampleState extends State<EditableExample> {
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: _textEditingController,
               builder: (context, value, child) {
-                return TexImage(
-                  value.text,
-                  displayMode: _displayMode,
+                return Center(
+                  child: ColoredBox(
+                    color: Colors.amber,
+                    child: TexImage(
+                      value.text,
+                      displayMode: _displayMode,
+                    ),
+                  ),
                 );
               },
             ),
-            const SizedBox(height: 8),
-            const Text('Horizontal scroll'),
+            const SizedBox(height: 24),
+            const Center(child: Text('Horizontal scroll')),
             const SizedBox(height: 8),
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: _textEditingController,
@@ -109,9 +113,11 @@ class _EditableExampleState extends State<EditableExample> {
                 ),
               ),
             ),
-            const Text(
-              'fin',
-              style: TextStyle(fontStyle: FontStyle.italic),
+            const Center(
+              child: Text(
+                'fin',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
             )
           ],
         ),
