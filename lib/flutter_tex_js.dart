@@ -26,6 +26,13 @@ class FlutterTexJs {
       'maxWidth': maxWidth,
     });
   }
+
+  static Future<void> cancel(String requestId) {
+    assert(requestId != null);
+    return _channel.invokeMethod<void>('cancel', {
+      'requestId': requestId,
+    });
+  }
 }
 
 String _colorToCss(Color color) =>
@@ -57,6 +64,12 @@ class _TexImageState extends State<TexImage>
     with AutomaticKeepAliveClientMixin<TexImage> {
   String get id =>
       widget.key?.hashCode?.toString() ?? identityHashCode(this).toString();
+
+  @override
+  void dispose() {
+    FlutterTexJs.cancel(id);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

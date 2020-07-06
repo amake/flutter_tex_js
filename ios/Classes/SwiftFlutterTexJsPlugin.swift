@@ -23,6 +23,8 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "UnsupportedOsVersion", message: "iOS 11+ is required", details: nil))
             }
+        case "cancel":
+            handleCancel(call, result)
         default:
             result(FlutterError(code: "UnsupportedMethod", message: "\(call.method) is not supported", details: nil))
         }
@@ -128,6 +130,23 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
         }
         queue.async(execute: job!)
     }
+
+    func handleCancel(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String:Any?] else {
+            result(FlutterError(code: "MissingArgs", message: "Required arguments missing", details: "\(call.method) requires 'requestId', 'text', 'displayMode', 'color'"))
+            return
+        }
+        guard let requestId = args["requestId"] as? String else {
+            result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'requestId'"))
+            return
+        }
+        if jobManager.clear(id: requestId) != nil {
+            debugPrint("Cancelled job \(requestId) by channel method")
+            debugPrint("Remaining jobs: \(jobManager.count)")
+        }
+        result(nil)
+    }
+}
 
 class ConcurrentDictionary<T> {
     var data: [String:T] = [:]
