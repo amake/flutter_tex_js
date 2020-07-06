@@ -22,6 +22,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  catex:
+    dependency: "direct main"
+    description:
+      name: catex
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1+2"
   charcode:
     dependency: transitive
     description:
@@ -192,5 +199,5 @@ packages:
     source: hosted
     version: "0.1.1+9"
 sdks:
-  dart: ">=2.7.0 <3.0.0"
+  dart: ">=2.8.4 <3.0.0"
   flutter: ">=1.12.13+hotfix.5"

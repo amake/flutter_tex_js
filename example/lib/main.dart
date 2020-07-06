@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tex_js/flutter_tex_js.dart';
+import 'package:flutter_tex_js_example/catex.dart';
 import 'package:flutter_tex_js_example/flutter_tex.dart';
 
 void main() => runApp(const MyApp());
@@ -8,6 +9,7 @@ const _tabs = [
   Tab(child: Text('Edit')),
   Tab(child: Text('∞')),
   Tab(child: Text('Flutter TeX')),
+  Tab(child: Text('CaTeX')),
 ];
 
 class MyApp extends StatelessWidget {
@@ -32,6 +34,7 @@ class MyApp extends StatelessWidget {
               EditableExample(),
               InfiniteExample(),
               FlutterTexExample(),
+              CatexExample(),
             ],
           ),
         ),
