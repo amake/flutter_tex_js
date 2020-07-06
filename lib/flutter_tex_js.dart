@@ -55,6 +55,9 @@ class TexImage extends StatefulWidget {
 
 class _TexImageState extends State<TexImage>
     with AutomaticKeepAliveClientMixin<TexImage> {
+  String get id =>
+      widget.key?.hashCode?.toString() ?? identityHashCode(this).toString();
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -62,7 +65,7 @@ class _TexImageState extends State<TexImage>
       builder: (context, constraints) => FutureBuilder<Uint8List>(
         future: FlutterTexJs.render(
           widget.math,
-          requestId: identityHashCode(this).toString(),
+          requestId: id,
           displayMode: widget.displayMode,
           color: widget.color ?? DefaultTextStyle.of(context).style.color,
           maxWidth: constraints.maxWidth,

@@ -131,6 +131,7 @@ class InfiniteExample extends StatelessWidget {
           '\\sqrt[$i]{a^2 + b^2} = ' * 5,
           // No line wrap in displayMode
           displayMode: false,
+          key: ValueKey(i),
         ),
       ),
     );
