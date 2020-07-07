@@ -57,7 +57,9 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        let queued = NSDate().timeIntervalSinceReferenceDate * 1000
+//        debugPrint("New request: \(args)")
+
+//        let queued = NSDate().timeIntervalSinceReferenceDate * 1000
 
         // Set up job; see
         // https://stackoverflow.com/a/38372384/448068
@@ -67,15 +69,14 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
         let cleanup = { [weak self] in
             job = nil
             self?.semaphore.signal()
-            debugPrint("Remaining jobs: \(self?.jobManager.count ?? -1)")
+//            debugPrint("Remaining jobs: \(self?.jobManager.count ?? -1)")
         }
 
         let isCancelled = { [weak self] () -> Bool in
             let queuedJob = self?.jobManager.get(requestId)
-            debugPrint("Queued job for \(requestId): \(queuedJob)")
             let cancelled = queuedJob == nil || job! !== queuedJob!
             if cancelled {
-                debugPrint("Job \(requestId) canceled! Exiting")
+//                debugPrint("Job \(requestId) canceled! Exiting")
                 result(FlutterError(code: "JobCancelled", message: "The job was cancelled", details: "Request ID: \(requestId)"))
                 cleanup()
             }
@@ -83,29 +84,36 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
         }
 
         job = DispatchWorkItem { [weak self] in
-            debugPrint("Job \(requestId) waiting; thread=\(Thread.current)")
+//            debugPrint("Job \(requestId) waiting")
             self?.semaphore.wait()
             guard !isCancelled() else { return }
+
             // WebView init has to be done on UI thread
             DispatchQueue.main.async {
-                debugPrint("Now on main thread; job=\(requestId)")
+//                debugPrint("Now on main thread; job=\(requestId)")
                 guard !isCancelled() else { return }
+
                 self?.renderer.whenReady { renderer in
-                    debugPrint("Now ready; job=\(requestId)")
+
+//                    debugPrint("Now ready; job=\(requestId)")
                     guard !isCancelled() else { return }
-                    let start = NSDate().timeIntervalSinceReferenceDate * 1000
-                    debugPrint("Going to render; job=\(requestId)")
+//                    let start = NSDate().timeIntervalSinceReferenceDate * 1000
+
+//                    debugPrint("Going to render; job=\(requestId)")
                     renderer.render(text, displayMode: displayMode, color: color, maxWidth: maxWidth) { data, error in
-                        debugPrint("Now back from render; job=\(requestId)")
+//                        debugPrint("Now back from render; job=\(requestId)")
                         guard !isCancelled() else { return }
-                        let end = NSDate().timeIntervalSinceReferenceDate * 1000
-                        debugPrint("Rendering \(text) (\(requestId)) took \(Int(end - queued)) ms (\(Int(end - start)) rendering; \(Int(start - queued)) queued)")
+
+//                        let end = NSDate().timeIntervalSinceReferenceDate * 1000
+//                        debugPrint("Rendering job \(requestId) took \(Int(end - queued)) ms (\(Int(end - start)) rendering; \(Int(start - queued)) queued)")
+
                         if let data = data {
                             result(FlutterStandardTypedData(bytes: data))
                         } else {
                             result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
                         }
-                        debugPrint("Job \(requestId) complete")
+
+//                        debugPrint("Job \(requestId) complete")
                         self?.jobManager.mapItem(id: requestId) { prev in
                             if prev == nil || prev! === job! {
                                 return nil
@@ -119,14 +127,9 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             }
         }
 
-//        if let existingJob = jobs[requestId] {
-//            debugPrint("Canceling existing job \(requestId)")
-//            existingJob.cancel()
-//        }
-
-        debugPrint("Queueing job \(requestId)")
+//        debugPrint("Queueing job \(requestId)")
         if jobManager.put(id: requestId, item: job) != nil {
-            debugPrint("Replaced existing job \(requestId)")
+//            debugPrint("Replaced existing job \(requestId)")
         }
         queue.async(execute: job!)
     }
@@ -141,8 +144,8 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             return
         }
         if jobManager.clear(id: requestId) != nil {
-            debugPrint("Cancelled job \(requestId) by channel method")
-            debugPrint("Remaining jobs: \(jobManager.count)")
+//            debugPrint("Cancelled job \(requestId) by channel method")
+//            debugPrint("Remaining jobs: \(jobManager.count)")
         }
         result(nil)
     }

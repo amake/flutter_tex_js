@@ -117,7 +117,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
                 self.resultListener = nil
             }
         default:
-            print("Message from WebView to: \(message.name); body: \(message.body)")
+            debugPrint("Message from WebView to: \(message.name); body: \(message.body)")
         }
     }
 
@@ -129,7 +129,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         setFrameWidth(maxWidth)
         let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
         let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); render('\(escapedMath)', \(displayMode));"
-        debugPrint("JavaScript: \(js)")
+//        debugPrint("Executing JavaScript: \(js)")
         resultListener = completionHandler
         webView.evaluateJavaScript(js) { [weak self] result, error in
             if result as? Bool == true {
@@ -150,7 +150,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         let frameWidth = newWidth.isFinite ? newWidth : Double(UIScreen.main.bounds.width)
         let newFrame = CGRect(x: 0, y: 0, width: Int(frameWidth.rounded(.down)), height: Int(webView.frame.height))
         if webView.frame != newFrame {
-            debugPrint("New frame width: \(frameWidth); was \(webView.frame.width)")
+//            debugPrint("New frame width: \(frameWidth); was \(webView.frame.width)")
             webView.frame = newFrame
         }
     }
@@ -161,6 +161,8 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         let w = (bbox["width"] as! NSNumber).intValue
         let h = (bbox["height"] as! NSNumber).intValue
         let rect = CGRect(x: x, y: y, width: w, height: h)
+//        debugPrint("Taking snapshot of \(rect)")
+
         let snapConfig = WKSnapshotConfiguration()
         snapConfig.rect = rect
         if #available(iOS 13.0, *) {
