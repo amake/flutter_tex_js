@@ -36,8 +36,7 @@ fileprivate let html = """
                output: 'html',
                displayMode: displayMode
            });
-           sendBounds();
-           return true;
+           return getBounds();
        } catch (error) {
            return error.toString();
        }
@@ -48,9 +47,8 @@ fileprivate let html = """
    function setNoWrap(noWrap) {
        getMathElement().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
    }
-   function sendBounds() {
-       const bounds = getMathElement().getBoundingClientRect().toJSON();
-       window.webkit.messageHandlers.result.postMessage(bounds);
+   function getBounds() {
+       return getMathElement().getBoundingClientRect().toJSON();
    }
    function loadAllFonts() {
        const fontLoadingPromises = [];
@@ -79,12 +77,11 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
     lazy var webView = initWebView()
     var ready = false
     var readyListener : ((TexRenderer) -> Void)?
-    var resultListener : ((Data?, Error?) -> Void)?
+    var busy = false
 
     private func initWebView() -> WKWebView {
         let controller = WKUserContentController()
         controller.add(self, name: "ready")
-        controller.add(self, name: "result")
         controller.add(self, name: "debug")
 
         let config = WKWebViewConfiguration()
@@ -110,19 +107,13 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
             ready = true
             readyListener?(self)
             readyListener = nil
-        case "result":
-            if let resultListener = resultListener,
-                let bounds = message.body as? [String:Any] {
-                takeSnapshot(bounds, resultListener)
-                self.resultListener = nil
-            }
         default:
             debugPrint("Message from WebView to: \(message.name); body: \(message.body)")
         }
     }
 
     func render(_ math: String, displayMode: Bool, color: String, maxWidth: Double, completionHandler: @escaping (Data?, Error?) -> Void) {
-        guard resultListener == nil else {
+        guard !busy else {
             completionHandler(nil, TexError.concurrentRequest)
             return
         }
@@ -130,19 +121,19 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
         let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); render('\(escapedMath)', \(displayMode));"
 //        debugPrint("Executing JavaScript: \(js)")
-        resultListener = completionHandler
+        busy = true
         webView.evaluateJavaScript(js) { [weak self] result, error in
-            if result as? Bool == true {
+            if let result = result as? [String:Any] {
                 // Success
-                return
-            }
-            // Failure
-            if let result = result as? String {
+                self?.takeSnapshot(result, completionHandler)
+            } else if let result = result as? String {
+                // Engine error
                 completionHandler(nil, TexError.engineError(message: result))
             } else {
+                // Other error
                 completionHandler(nil, TexError.executionError)
             }
-            self?.resultListener = nil
+            self?.busy = false
         }
     }
 
