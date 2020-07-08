@@ -39,3 +39,6 @@ lib/generated_plugin_registrant.dart
 
 # iOS assets
 ios/Assets/*
+
+# Android assets
+android/src/main/assets
