@@ -8,14 +8,16 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import java.util.concurrent.ConcurrentHashMap
 
 /** FlutterTexJsPlugin */
 public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineScope by MainScope() {
     private lateinit var channel: MethodChannel
     private lateinit var renderer: TexRenderer
+    private val jobManager = ConcurrentHashMap<String, Long>()
+    private val mutex = Mutex()
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_tex_js")
@@ -43,6 +45,7 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "render" -> handleRender(call, result)
+            "cancel" -> handleCancel(call, result)
             else -> result.notImplemented()
         }
     }
@@ -80,19 +83,53 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
             return
         }
 
-        Log.d("AMK", "Queued $requestId")
+        val timestamp = System.nanoTime()
+        Log.d("AMK", "Queued $requestId; timestamp=$timestamp")
 
-        Log.d("AMK", "Starting on thread ${Thread.currentThread()}")
-        renderer.whenReady {
-            Log.d("AMK", "Now ready; job=$requestId; thread=${Thread.currentThread()}")
-            it.render(text, displayMode, color, maxWidth) { bytes, error ->
+        val isCancelled: () -> Boolean = {
+            val queuedJob = jobManager[requestId]
+            val cancelled = queuedJob != timestamp
+            if (cancelled) {
+                launch(Dispatchers.Main) {
+                    result.error("JobCancelled", "The job was cancelled", "Request ID: $requestId")
+                }
+                mutex.unlock(requestId)
+            }
+            cancelled
+        }
+
+        launch(Dispatchers.Default) {
+            Log.d("AMK", "Job $requestId waiting on thread ${Thread.currentThread()}")
+            mutex.lock(requestId)
+            if (isCancelled()) { return@launch }
+            Log.d("AMK", "Job $requestId proceeding to whenReady")
+            renderer.render(text, displayMode, color, maxWidth) { bytes, error ->
                 Log.d("AMK", "Now back from render; job=$requestId; thread=${Thread.currentThread()}")
+                if (isCancelled()) { return@render }
                 if (bytes != null) {
                     result.success(bytes)
                 } else {
                     result.error(error!!.code, error.message, error.details)
                 }
+                mutex.unlock(requestId)
             }
         }
+        val prev = jobManager.put(requestId, timestamp)
+        if (prev != null) {
+            Log.d("AMK", "Replaced existing job $requestId")
+        }
+    }
+
+    private fun handleCancel(call: MethodCall, result: Result) {
+        val requestId = call.argument<String>("requestId")
+        if (requestId == null) {
+            result.error("Missing Arg", "Required argument missing", "${call.method} requires 'requestId'")
+            return
+        }
+        val prev = jobManager.remove(requestId)
+        if (prev != null) {
+            Log.d("AMK", "Cancelled job $requestId by channel method")
+        }
+        result.success(null)
     }
 }

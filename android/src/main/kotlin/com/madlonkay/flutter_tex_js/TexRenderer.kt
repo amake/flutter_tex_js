@@ -9,9 +9,8 @@ import android.os.Build
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import androidx.annotation.MainThread
+import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
@@ -24,7 +23,7 @@ private const val html =
     <link rel="stylesheet" href="katex/katex.min.css">
     <script src="katex/katex.min.js"></script>
     <style type="text/css">
-     body { background: transparent; }
+     body { background: transparent; margin: 0; }
      #math { float: left; }
     </style>
   </head>
@@ -82,19 +81,23 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
             val metrics = context.resources.displayMetrics
             layout(0, 0, metrics.widthPixels, metrics.heightPixels)
             setBackgroundColor(Color.TRANSPARENT)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                WebView.setWebContentsDebuggingEnabled(true)
-            }
         }
     }
     private var ready = false
-    private var readyListener: ((TexRenderer) -> Unit)? = null
+    private var readyListener: (suspend () -> Unit)? = null
     private var resultListener: ((ByteArray?, TexRenderError?) -> Unit)? = null
 
-    fun whenReady(completionHandler: (TexRenderer) -> Unit) {
+    @MainThread
+    private suspend fun whenReady(completionHandler: suspend () -> Unit) = withContext(Dispatchers.Main) {
         if (ready) {
-            completionHandler(this)
+            completionHandler()
         } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                WebView.setWebContentsDebuggingEnabled(true)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                WebView.enableSlowWholeDocumentDraw()
+            }
             readyListener = completionHandler
             webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", null, null)
         }
@@ -106,46 +109,56 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
         ready = true
         val listener = readyListener!!
         launch {
-            listener.invoke(this@TexRenderer)
+            listener.invoke()
         }
         readyListener = null
     }
 
     @JavascriptInterface
     fun takeSnapshot(x: Double, y: Double, width: Double, height: Double) {
-        Log.d("AMK", "Taking snapshot of [$x, $y, $width, $height]")
-        val bitmap = Bitmap.createBitmap(webView.width, webView.height, Bitmap.Config.ARGB_8888)
+        val xPx = (x * density).roundToInt()
+        val yPx = (y * density).roundToInt()
+        val widthPx = (width * density).roundToInt()
+        val heightPx = (height * density).roundToInt()
+        Log.d("AMK", "Taking snapshot of [$x, $y, $width, $height], scaled to [$xPx, $yPx, $widthPx, $heightPx]")
+        var bitmap = Bitmap.createBitmap(xPx + widthPx, yPx + heightPx, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val listener = resultListener!!
         launch {
             webView.draw(canvas)
-            val cropped = Bitmap.createBitmap(bitmap, (x * density).roundToInt(), (y * density).roundToInt(), (width * density).roundToInt(), (height * density).roundToInt())
+            if (xPx != 0 || yPx != 0) {
+                bitmap = Bitmap.createBitmap(bitmap, xPx, yPx, widthPx, heightPx)
+            }
             val bytes = ByteArrayOutputStream()
-            cropped.compress(Bitmap.CompressFormat.PNG, 100, bytes)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
             listener.invoke(bytes.toByteArray(), null)
         }
         resultListener = null
     }
 
-    fun render(math: String, displayMode: Boolean, color: String, maxWidth: Double, completionHandler: (ByteArray?, TexRenderError?) -> Unit) {
-        val escapedMath = math.replace("\\", "\\\\")
-        val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); render('$escapedMath', $displayMode);"
-        Log.d("AMK", "Executing JavaScript: $js")
-        setViewWidth(maxWidth)
-        resultListener = completionHandler
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            webView.evaluateJavascript(js) {
-                if (it != "true") {
-                    // failure
-                    val err = TexRenderError("RenderError", "An error occurred during rendering", it)
-                    completionHandler(null, err)
+    @MainThread
+    suspend fun render(math: String, displayMode: Boolean, color: String, maxWidth: Double, completionHandler: (ByteArray?, TexRenderError?) -> Unit) = withContext(Dispatchers.Main) {
+        whenReady {
+            val escapedMath = math.replace("\\", "\\\\")
+            val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); render('$escapedMath', $displayMode);"
+            Log.d("AMK", "Executing JavaScript: $js")
+            setViewWidth(maxWidth)
+            resultListener = completionHandler
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                webView.evaluateJavascript(js) {
+                    if (it != "true") {
+                        // failure
+                        val err = TexRenderError("RenderError", "An error occurred during rendering", it)
+                        completionHandler(null, err)
+                    }
                 }
+            } else {
+                webView.loadUrl("javascript:$js")
             }
-        } else {
-            webView.loadUrl("javascript:$js")
         }
     }
 
+    @MainThread
     private fun setViewWidth(width: Double) {
         val newWidth = if (width.isFinite()) {
             (width * density).roundToInt()
