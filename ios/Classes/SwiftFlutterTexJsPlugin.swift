@@ -114,7 +114,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
                         }
 
 //                        debugPrint("Job \(requestId) complete")
-                        self?.jobManager.mapItem(id: requestId) { prev in
+                        self?.jobManager.mapItem(key: requestId) { prev in
                             if prev == nil || prev! === job! {
                                 return nil
                             } else {
@@ -128,7 +128,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
         }
 
 //        debugPrint("Queueing job \(requestId)")
-        if jobManager.put(id: requestId, item: job) != nil {
+        if jobManager.put(key: requestId, value: job) != nil {
 //            debugPrint("Replaced existing job \(requestId)")
         }
         queue.async(execute: job!)
@@ -143,7 +143,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'requestId'"))
             return
         }
-        if jobManager.clear(id: requestId) != nil {
+        if jobManager.remove(requestId) != nil {
 //            debugPrint("Cancelled job \(requestId) by channel method")
 //            debugPrint("Remaining jobs: \(jobManager.count)")
         }
@@ -164,29 +164,29 @@ class ConcurrentDictionary<T> {
     }
 
     @discardableResult
-    func put(id: String, item: T?) -> T? {
-        mapItem(id: id) { prev in
-            item
+    func put(key: String, value: T?) -> T? {
+        mapItem(key: key) { prev in
+            value
         }
     }
 
     @discardableResult
-    func mapItem(id: String, block: @escaping (T?) -> T?) -> T? {
+    func mapItem(key: String, block: @escaping (T?) -> T?) -> T? {
         var previous: T?
         queue.sync(flags: .barrier) {
-            previous = self.data[id]
-            self.data[id] = block(previous)
+            previous = self.data[key]
+            self.data[key] = block(previous)
         }
         return previous
     }
 
     @discardableResult
-    func clear(id: String) -> T? {
-        return put(id: id, item: nil)
+    func remove(_ key: String) -> T? {
+        return put(key: key, value: nil)
     }
 
-    func get(_ id: String) -> T? {
-        readData[id]
+    func get(_ key: String) -> T? {
+        readData[key]
     }
 
     var count: Int {
