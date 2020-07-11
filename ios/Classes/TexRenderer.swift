@@ -14,53 +14,53 @@ fileprivate let assetsUrl = Bundle(for: TexRenderer.self).url(forResource: "flut
 fileprivate let html = """
 <!DOCTYPE html>
 <html>
-  <head>
-<meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="katex.min.css">
-    <script src="katex.min.js"></script>
-    <style type="text/css">
-     body { background: transparent; }
-     #math { float: left; }
-    </style>
-  </head>
-  <body>
-    <span id="math"></span>
-  </body>
-  <script>
-   function getMathElement() {
-       return document.getElementById('math');
-   }
-   function render(math, displayMode) {
-       try {
-           katex.render(math, getMathElement(), {
-               output: 'html',
-               displayMode: displayMode
-           });
-           return getBounds();
-       } catch (error) {
-           return error.toString();
-       }
-   }
-   function setColor(color) {
-       getMathElement().style.color = color;
-   }
-   function setNoWrap(noWrap) {
-       getMathElement().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
-   }
-   function getBounds() {
-       return getMathElement().getBoundingClientRect().toJSON();
-   }
-   function loadAllFonts() {
-       const fontLoadingPromises = [];
-       for (const font of document.fonts) {
-           fontLoadingPromises.push(font.load());
-       }
-       Promise.all(fontLoadingPromises).then(function() {
-           window.webkit.messageHandlers.ready.postMessage('ready');
-       });
-   }
-   loadAllFonts();
-  </script>
+    <head>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="katex.min.css">
+        <script src="katex.min.js"></script>
+        <style type="text/css">
+         body { background: transparent; }
+         #math { float: left; }
+        </style>
+    </head>
+    <body>
+        <span id="math"></span>
+    </body>
+    <script>
+     function getMathElement() {
+         return document.getElementById('math');
+     }
+     function render(math, displayMode) {
+         try {
+             katex.render(math, getMathElement(), {
+                 output: 'html',
+                 displayMode: displayMode
+             });
+             return getBounds();
+         } catch (error) {
+             return error.toString();
+         }
+     }
+     function setColor(color) {
+         getMathElement().style.color = color;
+     }
+     function setNoWrap(noWrap) {
+         getMathElement().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
+     }
+     function getBounds() {
+         return getMathElement().getBoundingClientRect().toJSON();
+     }
+     function loadAllFonts() {
+         const fontLoadingPromises = [];
+         for (const font of document.fonts) {
+             fontLoadingPromises.push(font.load());
+         }
+         Promise.all(fontLoadingPromises).then(function() {
+             window.webkit.messageHandlers.ready.postMessage('ready');
+         });
+     }
+     loadAllFonts();
+    </script>
 </html>
 """
 
