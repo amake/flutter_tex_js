@@ -13,7 +13,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
 
     let queue = DispatchQueue(label: "TexJsRenderQueue", qos: .userInteractive)
     let semaphore = DispatchSemaphore(value: 1)
-    let jobManager = ConcurrentDictionary<DispatchWorkItem>()
+    let jobManager = ConcurrentDictionary<String, DispatchWorkItem>()
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
@@ -145,12 +145,12 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
     }
 }
 
-class ConcurrentDictionary<T> {
-    var data: [String:T] = [:]
+class ConcurrentDictionary<K: Hashable,V: Equatable> {
+    var data: [K:V] = [:]
     let queue = DispatchQueue(label: "ConcurrentDictionaryQueue")
 
-    private var readData: [String:T] {
-        var data: [String:T]!
+    private var readData: [K:V] {
+        var data: [K:V]!
         queue.sync {
             data = self.data
         }
@@ -158,15 +158,15 @@ class ConcurrentDictionary<T> {
     }
 
     @discardableResult
-    func put(key: String, value: T?) -> T? {
+    func put(key: K, value: V?) -> V? {
         mapItem(key: key) { prev in
             value
         }
     }
 
     @discardableResult
-    func mapItem(key: String, block: @escaping (T?) -> T?) -> T? {
-        var previous: T?
+    func mapItem(key: K, block: @escaping (V?) -> V?) -> V? {
+        var previous: V?
         queue.sync(flags: .barrier) {
             previous = self.data[key]
             self.data[key] = block(previous)
@@ -175,11 +175,11 @@ class ConcurrentDictionary<T> {
     }
 
     @discardableResult
-    func remove(_ key: String) -> T? {
+    func remove(_ key: K) -> V? {
         return put(key: key, value: nil)
     }
 
-    func get(_ key: String) -> T? {
+    func get(_ key: K) -> V? {
         readData[key]
     }
 
