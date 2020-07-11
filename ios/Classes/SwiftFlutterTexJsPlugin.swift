@@ -92,37 +92,31 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             DispatchQueue.main.async {
 //                debugPrint("Now on main thread; job=\(requestId)")
                 guard !isCancelled() else { return }
-
-                self?.renderer.whenReady { renderer in
-
-//                    debugPrint("Now ready; job=\(requestId)")
-                    guard !isCancelled() else { return }
 //                    let start = NSDate().timeIntervalSinceReferenceDate * 1000
 
 //                    debugPrint("Going to render; job=\(requestId)")
-                    renderer.render(text, displayMode: displayMode, color: color, maxWidth: maxWidth) { data, error in
+                self?.renderer.render(text, displayMode: displayMode, color: color, maxWidth: maxWidth) { data, error in
 //                        debugPrint("Now back from render; job=\(requestId)")
-                        guard !isCancelled() else { return }
+                    guard !isCancelled() else { return }
 
 //                        let end = NSDate().timeIntervalSinceReferenceDate * 1000
 //                        debugPrint("Rendering job \(requestId) took \(Int(end - queued)) ms (\(Int(end - start)) rendering; \(Int(start - queued)) queued)")
 
-                        if let data = data {
-                            result(FlutterStandardTypedData(bytes: data))
-                        } else {
-                            result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
-                        }
+                    if let data = data {
+                        result(FlutterStandardTypedData(bytes: data))
+                    } else {
+                        result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
+                    }
 
 //                        debugPrint("Job \(requestId) complete")
-                        self?.jobManager.mapItem(key: requestId) { prev in
-                            if prev == nil || prev! === job! {
-                                return nil
-                            } else {
-                                return prev
-                            }
+                    self?.jobManager.mapItem(key: requestId) { prev in
+                        if prev == nil || prev! === job! {
+                            return nil
+                        } else {
+                            return prev
                         }
-                        cleanup()
                     }
+                    cleanup()
                 }
             }
         }

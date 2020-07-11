@@ -76,7 +76,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
 
     lazy var webView = initWebView()
     var ready = false
-    var readyListener : ((TexRenderer) -> Void)?
+    var readyListener : (() -> Void)?
     var busy = false
 
     private func initWebView() -> WKWebView {
@@ -92,9 +92,9 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         return webView
     }
 
-    func whenReady(_ completionHandler: @escaping (TexRenderer) -> Void) {
+    private func whenReady(_ completionHandler: @escaping () -> Void) {
         if ready {
-            completionHandler(self)
+            completionHandler()
         } else {
             readyListener = completionHandler
             webView.loadHTMLString(html, baseURL: assetsUrl)
@@ -105,7 +105,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         switch message.name {
         case "ready":
             ready = true
-            readyListener?(self)
+            readyListener?()
             readyListener = nil
         default:
             debugPrint("Message from WebView to: \(message.name); body: \(message.body)")
@@ -113,27 +113,35 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
     }
 
     func render(_ math: String, displayMode: Bool, color: String, maxWidth: Double, completionHandler: @escaping (Data?, Error?) -> Void) {
-        guard !busy else {
-            completionHandler(nil, TexError.concurrentRequest)
-            return
-        }
-        setFrameWidth(maxWidth)
-        let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
-        let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); render('\(escapedMath)', \(displayMode));"
-//        debugPrint("Executing JavaScript: \(js)")
-        busy = true
-        webView.evaluateJavaScript(js) { [weak self] result, error in
-            if let result = result as? [String:Any] {
-                // Success
-                self?.takeSnapshot(result, completionHandler)
-            } else if let result = result as? String {
-                // Engine error
-                completionHandler(nil, TexError.engineError(message: result))
-            } else {
-                // Other error
-                completionHandler(nil, TexError.executionError)
+        whenReady { [weak self] in
+            guard let self = self else {
+                return
             }
-            self?.busy = false
+            guard !self.busy else {
+                completionHandler(nil, TexError.concurrentRequest)
+                return
+            }
+            self.setFrameWidth(maxWidth)
+            let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
+            let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); render('\(escapedMath)', \(displayMode));"
+    //        debugPrint("Executing JavaScript: \(js)")
+            self.busy = true
+            self.webView.evaluateJavaScript(js) { [weak self] result, error in
+                guard let self = self else {
+                    return
+                }
+                if let result = result as? [String:Any] {
+                    // Success
+                    self.takeSnapshot(result, completionHandler)
+                } else if let result = result as? String {
+                    // Engine error
+                    completionHandler(nil, TexError.engineError(message: result))
+                } else {
+                    // Other error
+                    completionHandler(nil, TexError.executionError)
+                }
+                self.busy = false
+            }
         }
     }
 
