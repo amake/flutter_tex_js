@@ -13,7 +13,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
 
     let queue = DispatchQueue(label: "TexJsRenderQueue", qos: .userInteractive)
     let semaphore = DispatchSemaphore(value: 1)
-    let jobManager = ConcurrentDictionary<String, DispatchWorkItem>()
+    let jobManager = ConcurrentDictionary<String, Double>()
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
@@ -59,31 +59,24 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
 
 //        debugPrint("New request: \(args)")
 
-//        let queued = NSDate().timeIntervalSinceReferenceDate * 1000
+        let timestamp = NSDate().timeIntervalSinceReferenceDate
 
         // Set up job; see
         // https://stackoverflow.com/a/38372384/448068
 
-        var job: DispatchWorkItem?
-
-        let cleanup = { [weak self] in
-            job = nil
-            self?.semaphore.signal()
-//            debugPrint("Remaining jobs: \(self?.jobManager.count ?? -1)")
-        }
-
         let isCancelled = { [weak self] () -> Bool in
             let queuedJob = self?.jobManager.get(requestId)
-            let cancelled = queuedJob == nil || job! !== queuedJob!
+            let cancelled = timestamp != queuedJob
             if cancelled {
 //                debugPrint("Job \(requestId) canceled! Exiting")
                 result(FlutterError(code: "JobCancelled", message: "The job was cancelled", details: "Request ID: \(requestId)"))
-                cleanup()
+                self?.semaphore.signal()
+                debugPrint("Remaining jobs: \(self?.jobManager.count ?? -1)")
             }
             return cancelled
         }
 
-        job = DispatchWorkItem { [weak self] in
+        queue.async { [weak self] in
 //            debugPrint("Job \(requestId) waiting")
             self?.semaphore.wait()
             guard !isCancelled() else { return }
@@ -92,15 +85,15 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             DispatchQueue.main.async {
 //                debugPrint("Now on main thread; job=\(requestId)")
                 guard !isCancelled() else { return }
-//                    let start = NSDate().timeIntervalSinceReferenceDate * 1000
+//                let start = NSDate().timeIntervalSinceReferenceDate
 
-//                    debugPrint("Going to render; job=\(requestId)")
+//                debugPrint("Going to render; job=\(requestId)")
                 self?.renderer.render(text, displayMode: displayMode, color: color, maxWidth: maxWidth) { data, error in
-//                        debugPrint("Now back from render; job=\(requestId)")
+                    //                        debugPrint("Now back from render; job=\(requestId)")
                     guard !isCancelled() else { return }
 
-//                        let end = NSDate().timeIntervalSinceReferenceDate * 1000
-//                        debugPrint("Rendering job \(requestId) took \(Int(end - queued)) ms (\(Int(end - start)) rendering; \(Int(start - queued)) queued)")
+//                    let end = NSDate().timeIntervalSinceReferenceDate
+//                    debugPrint("Rendering job \(requestId) took \(Int((end - timestamp) * 1000)) ms (\(Int((end - start) * 1000)) rendering; \(Int((start - timestamp) * 1000)) queued)")
 
                     if let data = data {
                         result(FlutterStandardTypedData(bytes: data))
@@ -108,24 +101,18 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
                         result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
                     }
 
-//                        debugPrint("Job \(requestId) complete")
-                    self?.jobManager.mapItem(key: requestId) { prev in
-                        if prev == nil || prev! === job! {
-                            return nil
-                        } else {
-                            return prev
-                        }
-                    }
-                    cleanup()
+//                    debugPrint("Job \(requestId) complete")
+                    self?.jobManager.remove(key: requestId, value: timestamp)
+                    self?.semaphore.signal()
                 }
             }
         }
 
 //        debugPrint("Queueing job \(requestId)")
-        if jobManager.put(key: requestId, value: job) != nil {
+        let prev = jobManager.put(key: requestId, value: timestamp)
+        if prev != nil {
 //            debugPrint("Replaced existing job \(requestId)")
         }
-        queue.async(execute: job!)
     }
 
     func handleCancel(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
@@ -177,6 +164,19 @@ class ConcurrentDictionary<K: Hashable,V: Equatable> {
     @discardableResult
     func remove(_ key: K) -> V? {
         return put(key: key, value: nil)
+    }
+
+    @discardableResult
+    func remove(key: K, value: V?) -> Bool {
+        var removed = false
+        mapItem(key: key) { prev in
+            if prev == value {
+                removed = true
+                return nil
+            }
+            return prev
+        }
+        return removed
     }
 
     func get(_ key: K) -> V? {
