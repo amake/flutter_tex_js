@@ -111,6 +111,7 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
                 } else {
                     result.error(error!!.code, error.message, error.details)
                 }
+                jobManager.remove(requestId, timestamp)
                 mutex.unlock(requestId)
             }
         }
