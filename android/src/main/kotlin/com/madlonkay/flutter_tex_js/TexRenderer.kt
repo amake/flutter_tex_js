@@ -40,10 +40,13 @@ private const val html =
                  output: 'html',
                  displayMode: displayMode
              });
+             // Returning immediately or setting 0 timeout here yielded bad results (incomplete
+             // rendering, that weird zooming thing)
              setTimeout(sendBounds, 100);
              return true;
          } catch (error) {
-             return error.toString();
+             sendError(error);
+             return false;
          }
      }
      function setColor(color) {
@@ -51,6 +54,9 @@ private const val html =
      }
      function setNoWrap(noWrap) {
          getMathElement().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
+     }
+     function sendError(error) {
+         TexRenderer.onError(error.toString());
      }
      function sendBounds() {
          const bounds = getMathElement().getBoundingClientRect();
@@ -115,6 +121,17 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
     }
 
     @JavascriptInterface
+    fun onError(error: String) {
+        Log.d("AMK", "onError called; thread=${Thread.currentThread()}")
+        val listener = resultListener!!
+        launch {
+            val err = TexRenderError("RenderError", "An error occurred during rendering", error)
+            listener(null, err)
+        }
+        resultListener = null
+    }
+
+    @JavascriptInterface
     fun takeSnapshot(x: Double, y: Double, width: Double, height: Double) {
         val xPx = (x * density).roundToInt()
         val yPx = (y * density).roundToInt()
@@ -139,22 +156,19 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
     @MainThread
     suspend fun render(math: String, displayMode: Boolean, color: String, maxWidth: Double, completionHandler: (ByteArray?, TexRenderError?) -> Unit) = withContext(Dispatchers.Main) {
         whenReady {
+            if (resultListener != null) {
+                val err = TexRenderError("ConcurrencyError", "A render job was already in progress", null)
+                completionHandler(null, err)
+                return@whenReady
+            }
             val escapedMath = math.replace("\\", "\\\\")
             val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); render('$escapedMath', $displayMode);"
             Log.d("AMK", "Executing JavaScript: $js")
             setViewWidth(maxWidth)
             resultListener = completionHandler
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                webView.evaluateJavascript(js) {
-                    if (it != "true") {
-                        // failure
-                        val err = TexRenderError("RenderError", "An error occurred during rendering", it)
-                        completionHandler(null, err)
-                    }
-                }
-            } else {
-                webView.loadUrl("javascript:$js")
-            }
+            // We call loadUrl instead of evaluateJavascript for backwards compatibility, and
+            // because we can't really make use of the immediately returned result
+            webView.loadUrl("javascript:$js")
         }
     }
 
