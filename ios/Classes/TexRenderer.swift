@@ -20,7 +20,7 @@ fileprivate let html = """
         <script src="katex.min.js"></script>
         <style type="text/css">
          body { background: transparent; }
-         #math { float: left; }
+         #math { float: left; padding: 1px; }
         </style>
     </head>
     <body>
