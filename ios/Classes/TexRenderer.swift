@@ -121,11 +121,11 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
                 completionHandler(nil, TexError.concurrentRequest)
                 return
             }
+            self.busy = true
             self.setFrameWidth(maxWidth)
             let escapedMath = math.replacingOccurrences(of: "\\", with: "\\\\")
             let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); render('\(escapedMath)', \(displayMode));"
             log("Executing JavaScript: \(js)")
-            self.busy = true
             self.webView.evaluateJavaScript(js) { [weak self] result, error in
                 guard let self = self else {
                     return

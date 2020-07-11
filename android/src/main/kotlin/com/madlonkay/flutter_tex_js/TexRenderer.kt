@@ -161,11 +161,11 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
                 completionHandler(null, err)
                 return@whenReady
             }
+            resultListener = completionHandler
             val escapedMath = math.replace("\\", "\\\\")
             val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); render('$escapedMath', $displayMode);"
             Log.d("AMK", "Executing JavaScript: $js")
             setViewWidth(maxWidth)
-            resultListener = completionHandler
             // We call loadUrl instead of evaluateJavascript for backwards compatibility, and
             // because we can't really make use of the immediately returned result
             webView.loadUrl("javascript:$js")
