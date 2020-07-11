@@ -28,7 +28,7 @@ packages:
       name: catex
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1+2"
+    version: "0.0.1+4"
   charcode:
     dependency: transitive
     description:
@@ -73,7 +73,7 @@ packages:
       name: flutter_tex
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.6.7+6"
+    version: "3.6.7+8"
   flutter_tex_js:
     dependency: "direct main"
     description:
