@@ -13,3 +13,7 @@ $(katex_ios):
 
 $(katex_android):
 	cd $(@D); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
+
+.PHONY: clobber
+clobber:
+	rm -rf $(katex_ios) $(katex_android)
