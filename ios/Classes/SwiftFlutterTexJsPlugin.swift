@@ -1,6 +1,12 @@
 import Flutter
 import UIKit
 
+func log(_ message: String) {
+    #if DEBUG
+        print(message)
+    #endif
+}
+
 public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_tex_js", binaryMessenger: registrar.messenger())
@@ -57,43 +63,40 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             return
         }
 
-//        debugPrint("New request: \(args)")
+        log("New request: \(args)")
 
         let timestamp = NSDate().timeIntervalSinceReferenceDate
-
-        // Set up job; see
-        // https://stackoverflow.com/a/38372384/448068
 
         let isCancelled = { [weak self] () -> Bool in
             let queuedJob = self?.jobManager.get(requestId)
             let cancelled = timestamp != queuedJob
             if cancelled {
-//                debugPrint("Job \(requestId) canceled! Exiting")
+                log("Job \(requestId) canceled! Exiting")
                 result(FlutterError(code: "JobCancelled", message: "The job was cancelled", details: "Request ID: \(requestId)"))
                 self?.semaphore.signal()
-                debugPrint("Remaining jobs: \(self?.jobManager.count ?? -1)")
+                log("Remaining jobs: \(self?.jobManager.count ?? -1)")
             }
             return cancelled
         }
 
         queue.async { [weak self] in
-//            debugPrint("Job \(requestId) waiting")
+            log("Job \(requestId) waiting")
             self?.semaphore.wait()
             guard !isCancelled() else { return }
 
             // WebView init has to be done on UI thread
             DispatchQueue.main.async {
-//                debugPrint("Now on main thread; job=\(requestId)")
+                log("Now on main thread; job=\(requestId)")
                 guard !isCancelled() else { return }
-//                let start = NSDate().timeIntervalSinceReferenceDate
+                let start = NSDate().timeIntervalSinceReferenceDate
 
-//                debugPrint("Going to render; job=\(requestId)")
+                log("Going to render; job=\(requestId)")
                 self?.renderer.render(text, displayMode: displayMode, color: color, maxWidth: maxWidth) { data, error in
-                    //                        debugPrint("Now back from render; job=\(requestId)")
+                    log("Now back from render; job=\(requestId)")
                     guard !isCancelled() else { return }
 
-//                    let end = NSDate().timeIntervalSinceReferenceDate
-//                    debugPrint("Rendering job \(requestId) took \(Int((end - timestamp) * 1000)) ms (\(Int((end - start) * 1000)) rendering; \(Int((start - timestamp) * 1000)) queued)")
+                    let end = NSDate().timeIntervalSinceReferenceDate
+                    log("Rendering job \(requestId) took \(Int((end - timestamp) * 1000)) ms (\(Int((end - start) * 1000)) rendering; \(Int((start - timestamp) * 1000)) queued)")
 
                     if let data = data {
                         result(FlutterStandardTypedData(bytes: data))
@@ -101,17 +104,17 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
                         result(FlutterError(code: "RenderError", message: "An error occurred during rendering", details: "\(error!)"))
                     }
 
-//                    debugPrint("Job \(requestId) complete")
+                    log("Job \(requestId) complete")
                     self?.jobManager.remove(key: requestId, value: timestamp)
                     self?.semaphore.signal()
                 }
             }
         }
 
-//        debugPrint("Queueing job \(requestId)")
+        log("Queueing job \(requestId)")
         let prev = jobManager.put(key: requestId, value: timestamp)
         if prev != nil {
-//            debugPrint("Replaced existing job \(requestId)")
+            log("Replaced existing job \(requestId)")
         }
     }
 
@@ -125,8 +128,8 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
             return
         }
         if jobManager.remove(requestId) != nil {
-//            debugPrint("Cancelled job \(requestId) by channel method")
-//            debugPrint("Remaining jobs: \(jobManager.count)")
+            log("Cancelled job \(requestId) by channel method")
+            log("Remaining jobs: \(jobManager.count)")
         }
         result(nil)
     }
