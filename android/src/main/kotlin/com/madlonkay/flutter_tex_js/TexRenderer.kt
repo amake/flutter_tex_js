@@ -162,8 +162,7 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
                 return@whenReady
             }
             resultListener = completionHandler
-            val escapedMath = math.replace("\\", "\\\\")
-            val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); render('$escapedMath', $displayMode);"
+            val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); render('$math', $displayMode);"
             Log.d("AMK", "Executing JavaScript: $js")
             setViewWidth(maxWidth)
             // We call loadUrl instead of evaluateJavascript for backwards compatibility, and

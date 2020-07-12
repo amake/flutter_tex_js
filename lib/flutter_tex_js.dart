@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -18,9 +19,14 @@ class FlutterTexJs {
     assert(displayMode != null);
     assert(color != null);
     assert(maxWidth != null);
+    final escapedText = _escapeForJavaScript(text);
+    if (escapedText != text && !kReleaseMode) {
+      debugPrint(
+          'Escaped text to render; was: "$text"; escaped: "$escapedText"');
+    }
     return _channel.invokeMethod<Uint8List>('render', {
       'requestId': requestId,
-      'text': text,
+      'text': escapedText,
       'displayMode': displayMode,
       'color': _colorToCss(color),
       'maxWidth': maxWidth,
@@ -34,6 +40,17 @@ class FlutterTexJs {
     });
   }
 }
+
+final _unescapedBackslashPattern = RegExp(r'(?<!\\)(?:\\\\)*\\');
+final _unescapedAposPattern = RegExp(r"(?<!\\)(?:\\\\)*'");
+
+// Native layer will concatenate with apostrophes to form a JavaScript string
+// literal; prepare here for that.
+String _escapeForJavaScript(String string) => string
+    .replaceAll(_unescapedBackslashPattern, r'\\')
+    .replaceAll('\n', r'\n')
+    .replaceAll('\r', r'\r')
+    .replaceAll(_unescapedAposPattern, r"\'");
 
 String _colorToCss(Color color) =>
     'rgba(${color.red},${color.green},${color.blue},${color.opacity})';
