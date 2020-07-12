@@ -66,7 +66,7 @@ fileprivate let html = """
 
 enum TexError : Error {
     case engineError(message: String)
-    case executionError
+    case executionError(message: String)
     case pngConversion
     case concurrentRequest
 }
@@ -136,9 +136,11 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
                 } else if let result = result as? String {
                     // Engine error
                     completionHandler(nil, TexError.engineError(message: result))
-                } else {
+                } else if let result = result {
                     // Other error
-                    completionHandler(nil, TexError.executionError)
+                    completionHandler(nil, TexError.executionError(message: "\(result)"))
+                } else {
+                    completionHandler(nil, error)
                 }
                 self.busy = false
             }
