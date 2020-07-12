@@ -1,14 +1,26 @@
 # flutter_tex_js
 
-A new flutter plugin project.
+A lightweight TeX plugin for Flutter based on [KaTeX](https://katex.org/), a
+popular and full-featured JavaScript TeX rendering library.
 
-## Getting Started
+# What's different about this plugin?
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+As of July 2020, there are several other TeX packages/plugins for Flutter, but
+most of them are either a) very heavyweight, relying on webview_flutter, or b)
+very immature, with poor support for common TeX syntax.
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+This plugin seeks a middle ground: It uses a single native webview under the
+hood, in which it renders TeX markup to PNG. It then sends the PNG bytes back to
+the Dart world where the result is displayed as an image.
+
+# Usage
+
+```dart
+import 'package:flutter_tex_js/flutter_tex_js.dart';
+
+class MyMathWidget extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return TexImage(r'a=\pm\sqrt{b^2+c^2} \int_\infty^\beta d\gamma');
+  }
+}
+```
