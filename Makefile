@@ -4,6 +4,7 @@ katex_ios := ios/Assets/katex
 katex_android := android/src/main/assets/katex
 
 .PHONY: assets
+assets: ## Download vendor assets
 assets: $(katex_ios) $(katex_android)
 
 $(katex_ios):
@@ -15,5 +16,14 @@ $(katex_android):
 	cd $(@D); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
 
 .PHONY: clobber
+clobber: ## Delete all vendor files
 clobber:
 	rm -rf $(katex_ios) $(katex_android)
+
+.PHONY: help
+help: ## Show this help text
+	$(info usage: make [target])
+	$(info )
+	$(info Available targets:)
+	@awk -F ':.*?## *' '/^[^\t].+?:.*?##/ \
+         {printf "  %-24s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
