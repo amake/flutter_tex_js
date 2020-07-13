@@ -76,12 +76,16 @@ const Set<String> flutterTexJsSupportedEnvironments = {
   'drcases',
 };
 
+typedef ErrorWidgetBuilder = Widget Function(
+    BuildContext context, Object error);
+
 class TexImage extends StatefulWidget {
   const TexImage(
     this.math, {
     this.displayMode = true,
     this.color,
     this.placeholder,
+    this.error,
     this.keepAlive = true,
     Key key,
   })  : assert(math != null),
@@ -92,6 +96,7 @@ class TexImage extends StatefulWidget {
   final bool displayMode;
   final Color color;
   final Widget placeholder;
+  final ErrorWidgetBuilder error;
   final bool keepAlive;
 
   @override
@@ -146,13 +151,16 @@ class _TexImageState extends State<TexImage>
           return const SizedBox.shrink();
       }
     }
-    return Column(
-      children: [
-        const Icon(Icons.error),
-        Text(error.toString()),
-      ],
-    );
+    final errorBuilder = widget.error ?? defaultError;
+    return errorBuilder(context, error);
   }
+
+  Widget defaultError(BuildContext context, Object error) => Column(
+        children: [
+          const Icon(Icons.error),
+          Text(error.toString()),
+        ],
+      );
 
   @override
   bool get wantKeepAlive => widget.keepAlive;
