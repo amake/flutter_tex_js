@@ -1,4 +1,4 @@
-katex_version := v0.11.1
+katex_version := v0.12.0
 katex_url := https://github.com/KaTeX/KaTeX/releases/download/$(katex_version)/katex.tar.gz
 katex_ios := ios/Assets/katex
 katex_android := android/src/main/assets/katex
