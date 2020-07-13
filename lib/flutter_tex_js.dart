@@ -55,6 +55,27 @@ String _escapeForJavaScript(String string) => string
 String _colorToCss(Color color) =>
     'rgba(${color.red},${color.green},${color.blue},${color.opacity})';
 
+/// A set listing the supported TeX environments; see
+/// https://katex.org/docs/supported.html#environments
+const Set<String> flutterTexJsSupportedEnvironments = {
+  'matrix',
+  'pmatrix',
+  'vmatrix',
+  'Bmatrix',
+  'aligned',
+  'gathered',
+  'smallmatrix',
+  'array',
+  'bmatrix',
+  'Vmatrix',
+  'alignedat',
+  'cases',
+  'rcases',
+  'darray',
+  'dcases',
+  'drcases',
+};
+
 class TexImage extends StatefulWidget {
   const TexImage(
     this.math, {
