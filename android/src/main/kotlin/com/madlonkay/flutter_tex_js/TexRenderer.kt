@@ -24,6 +24,7 @@ private const val html =
         <script src="katex/katex.min.js"></script>
         <style type="text/css">
          body { background: transparent; margin: 0; }
+         .katex-display { margin: 0; }
          #math { float: left; }
         </style>
     </head>
@@ -31,12 +32,12 @@ private const val html =
         <span id="math"></span>
     </body>
     <script>
-     function getMathElement() {
+     function getContainer() {
          return document.getElementById('math');
      }
      function render(math, displayMode) {
          try {
-             katex.render(math, getMathElement(), {
+             katex.render(math, getContainer(), {
                  output: 'html',
                  displayMode: displayMode
              });
@@ -50,16 +51,16 @@ private const val html =
          }
      }
      function setColor(color) {
-         getMathElement().style.color = color;
+         getContainer().style.color = color;
      }
      function setNoWrap(noWrap) {
-         getMathElement().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
+         getContainer().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
      }
      function sendError(error) {
          TexRenderer.onError(error.toString());
      }
      function sendBounds() {
-         const bounds = getMathElement().getBoundingClientRect();
+         const bounds = getContainer().getBoundingClientRect();
          TexRenderer.takeSnapshot(bounds.x, bounds.y, bounds.width, bounds.height);
      }
      function loadAllFonts() {

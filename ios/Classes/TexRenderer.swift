@@ -19,20 +19,21 @@ fileprivate let html = """
         <link rel="stylesheet" href="katex.min.css">
         <script src="katex.min.js"></script>
         <style type="text/css">
-         body { background: transparent; }
-         #math { float: left; padding: 1px; }
+         body { background: transparent; margin: 0; }
+         .katex-display { margin: 0; }
+         #math { float: left; padding-top: 1px; }
         </style>
     </head>
     <body>
         <span id="math"></span>
     </body>
     <script>
-     function getMathElement() {
+     function getContainer() {
          return document.getElementById('math');
      }
      function render(math, displayMode) {
          try {
-             katex.render(math, getMathElement(), {
+             katex.render(math, getContainer(), {
                  output: 'html',
                  displayMode: displayMode
              });
@@ -42,13 +43,13 @@ fileprivate let html = """
          }
      }
      function setColor(color) {
-         getMathElement().style.color = color;
+         getContainer().style.color = color;
      }
      function setNoWrap(noWrap) {
-         getMathElement().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
+         getContainer().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
      }
      function getBounds() {
-         return getMathElement().getBoundingClientRect().toJSON();
+         return getContainer().getBoundingClientRect().toJSON();
      }
      function loadAllFonts() {
          const fontLoadingPromises = [];
