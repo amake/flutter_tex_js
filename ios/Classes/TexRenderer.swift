@@ -21,7 +21,7 @@ fileprivate let html = """
         <style type="text/css">
          body { background: transparent; margin: 0; }
          .katex-display { margin: 0; }
-         #math { float: left; padding-top: 1px; }
+         #math { float: left; padding-top: 1px; padding-bottom: 1px; }
         </style>
     </head>
     <body>
