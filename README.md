@@ -13,6 +13,14 @@ This plugin seeks a middle ground: It uses a single native webview under the
 hood, in which it renders TeX markup to PNG. It then sends the PNG bytes back to
 the Dart world where the result is displayed as an image.
 
+# Supported platforms
+
+- Android 4.1 (SDK 16) and higher
+- iOS 11 and higher*
+  - *You can include the plugin on iOS 9+, but it will only render on 11+. On
+    iOS 9 and 10, the `TexImage` widget will simply show the supplied text
+    as-is.
+
 # Usage
 
 ```dart
