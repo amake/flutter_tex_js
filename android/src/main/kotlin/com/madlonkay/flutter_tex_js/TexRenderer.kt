@@ -53,6 +53,9 @@ private const val html =
      function setColor(color) {
          getContainer().style.color = color;
      }
+     function setFontSize(fontSize) {
+         getContainer().style.fontSize = fontSize;
+     }
      function setNoWrap(noWrap) {
          getContainer().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
      }
@@ -155,7 +158,7 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
     }
 
     @MainThread
-    suspend fun render(math: String, displayMode: Boolean, color: String, maxWidth: Double, completionHandler: (ByteArray?, TexRenderError?) -> Unit) = withContext(Dispatchers.Main) {
+    suspend fun render(math: String, displayMode: Boolean, color: String, fontSize: Double, maxWidth: Double, completionHandler: (ByteArray?, TexRenderError?) -> Unit) = withContext(Dispatchers.Main) {
         whenReady {
             if (resultListener != null) {
                 val err = TexRenderError("ConcurrencyError", "A render job was already in progress", null)
@@ -163,7 +166,7 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
                 return@whenReady
             }
             resultListener = completionHandler
-            val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); render('$math', $displayMode);"
+            val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); setFontSize('${fontSize}px'); render('$math', $displayMode);"
             Log.d("AMK", "Executing JavaScript: $js")
             setViewWidth(maxWidth)
             // We call loadUrl instead of evaluateJavascript for backwards compatibility, and

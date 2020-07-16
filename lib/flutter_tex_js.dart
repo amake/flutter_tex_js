@@ -13,6 +13,7 @@ class FlutterTexJs {
     @required String requestId,
     @required bool displayMode,
     @required Color color,
+    @required double fontSize,
     @required double maxWidth,
   }) async {
     assert(requestId != null);
@@ -29,6 +30,7 @@ class FlutterTexJs {
       'text': escapedText,
       'displayMode': displayMode,
       'color': _colorToCss(color),
+      'fontSize': fontSize,
       'maxWidth': maxWidth,
     });
   }
@@ -84,6 +86,7 @@ class TexImage extends StatefulWidget {
     this.math, {
     this.displayMode = true,
     this.color,
+    this.fontSize,
     this.placeholder,
     this.error,
     this.keepAlive = true,
@@ -95,6 +98,7 @@ class TexImage extends StatefulWidget {
   final String math;
   final bool displayMode;
   final Color color;
+  final double fontSize;
   final Widget placeholder;
   final ErrorWidgetBuilder error;
   final bool keepAlive;
@@ -118,27 +122,31 @@ class _TexImageState extends State<TexImage>
   Widget build(BuildContext context) {
     super.build(context);
     return LayoutBuilder(
-      builder: (context, constraints) => FutureBuilder<Uint8List>(
-        future: FlutterTexJs.render(
-          widget.math,
-          requestId: id,
-          displayMode: widget.displayMode,
-          color: widget.color ?? DefaultTextStyle.of(context).style.color,
-          maxWidth: constraints.maxWidth,
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Image.memory(
-              snapshot.data,
-              scale: MediaQuery.of(context).devicePixelRatio,
-            );
-          } else if (snapshot.hasError) {
-            return _buildErrorWidget(snapshot.error);
-          } else {
-            return widget.placeholder ?? Text(widget.math);
-          }
-        },
-      ),
+      builder: (context, constraints) {
+        final textStyle = DefaultTextStyle.of(context).style;
+        return FutureBuilder<Uint8List>(
+          future: FlutterTexJs.render(
+            widget.math,
+            requestId: id,
+            displayMode: widget.displayMode,
+            color: widget.color ?? textStyle.color,
+            fontSize: widget.fontSize ?? textStyle.fontSize,
+            maxWidth: constraints.maxWidth,
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Image.memory(
+                snapshot.data,
+                scale: MediaQuery.of(context).devicePixelRatio,
+              );
+            } else if (snapshot.hasError) {
+              return _buildErrorWidget(snapshot.error);
+            } else {
+              return widget.placeholder ?? Text(widget.math);
+            }
+          },
+        );
+      },
     );
   }
 

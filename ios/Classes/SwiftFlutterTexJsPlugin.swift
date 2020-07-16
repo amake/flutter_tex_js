@@ -39,7 +39,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
     @available(iOS 11.0, *)
     func handleRender(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String:Any?] else {
-            result(FlutterError(code: "MissingArgs", message: "Required arguments missing", details: "\(call.method) requires 'requestId', 'text', 'displayMode', 'color'"))
+            result(FlutterError(code: "MissingArgs", message: "Required arguments missing", details: "\(call.method) requires 'requestId', 'text', 'displayMode', 'color', 'fontSize', 'maxWidth'"))
             return
         }
         guard let requestId = args["requestId"] as? String else {
@@ -56,6 +56,10 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
         }
         guard let color = args["color"] as? String else {
             result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'color'"))
+            return
+        }
+        guard let fontSize = args["fontSize"] as? Double else {
+            result(FlutterError(code: "MissingArg", message: "Required argument missing", details: "\(call.method) requires 'fontSize'"))
             return
         }
         guard let maxWidth = args["maxWidth"] as? Double else {
@@ -91,7 +95,7 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
                 let start = NSDate().timeIntervalSinceReferenceDate
 
                 log("Going to render; job=\(requestId)")
-                self?.renderer.render(text, displayMode: displayMode, color: color, maxWidth: maxWidth) { data, error in
+                self?.renderer.render(text, displayMode: displayMode, color: color, fontSize: fontSize, maxWidth: maxWidth) { data, error in
                     log("Now back from render; job=\(requestId)")
                     guard !isCancelled() else { return }
 

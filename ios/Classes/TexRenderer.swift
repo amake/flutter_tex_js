@@ -45,6 +45,9 @@ fileprivate let html = """
      function setColor(color) {
          getContainer().style.color = color;
      }
+     function setFontSize(fontSize) {
+         getContainer().style.fontSize = fontSize;
+     }
      function setNoWrap(noWrap) {
          getContainer().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
      }
@@ -113,7 +116,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         }
     }
 
-    func render(_ math: String, displayMode: Bool, color: String, maxWidth: Double, completionHandler: @escaping (Data?, Error?) -> Void) {
+    func render(_ math: String, displayMode: Bool, color: String, fontSize: Double, maxWidth: Double, completionHandler: @escaping (Data?, Error?) -> Void) {
         whenReady { [weak self] in
             guard let self = self else {
                 return
@@ -124,7 +127,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
             }
             self.busy = true
             self.setFrameWidth(maxWidth)
-            let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); render('\(math)', \(displayMode));"
+            let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); setFontSize('\(fontSize)px'); render('\(math)', \(displayMode));"
             log("Executing JavaScript: \(js)")
             self.webView.evaluateJavaScript(js) { [weak self] result, error in
                 guard let self = self else {

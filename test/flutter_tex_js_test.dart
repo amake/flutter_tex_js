@@ -41,6 +41,7 @@ void main() {
           requestId: '',
           color: Colors.black,
           maxWidth: double.infinity,
+          fontSize: 12,
           displayMode: true,
         ),
         base64.decode(pixel));

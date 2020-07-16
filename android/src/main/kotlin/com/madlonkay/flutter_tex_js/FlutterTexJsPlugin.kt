@@ -77,6 +77,11 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
             result.error("Missing Arg", "Required argument missing", "${call.method} requires 'color'")
             return
         }
+        val fontSize = call.argument<Double>("fontSize")
+        if (fontSize == null) {
+            result.error("Missing Arg", "Required argument missing", "${call.method} requires 'fontSize'")
+            return
+        }
         val maxWidth = call.argument<Double>("maxWidth")
         if (maxWidth == null) {
             result.error("Missing Arg", "Required argument missing", "${call.method} requires 'maxWidth'")
@@ -103,7 +108,7 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
             mutex.lock(requestId)
             if (isCancelled()) { return@launch }
             Log.d("AMK", "Job $requestId proceeding to whenReady")
-            renderer.render(text, displayMode, color, maxWidth) { bytes, error ->
+            renderer.render(text, displayMode, color, fontSize, maxWidth) { bytes, error ->
                 Log.d("AMK", "Now back from render; job=$requestId; thread=${Thread.currentThread()}")
                 if (isCancelled()) { return@render }
                 if (bytes != null) {
