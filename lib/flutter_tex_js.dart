@@ -8,6 +8,28 @@ import 'package:flutter/services.dart';
 class FlutterTexJs {
   static const MethodChannel _channel = MethodChannel('flutter_tex_js');
 
+  /// Render the specified [text] to a PNG binary suitable for display with
+  /// [Image.memory].
+  ///
+  /// [requestId] is an arbitrary ID that identifies this render
+  /// request. Concurrent requests with the same ID will be coalesced: earlier
+  /// requests will return with null, and only the last request will complete
+  /// with data. You can also cancel a request with [cancel].
+  ///
+  /// [displayMode] is KaTeX's displayMode: math will be in display mode (\int,
+  /// \sum, etc. will be large). This is appropriate for "block" display, as
+  /// opposed to "inline" display. See also: https://katex.org/docs/options.html
+  ///
+  /// [color] is the color of the rendered text.
+  ///
+  /// [fontSize] is the size in pixels of the rendered text. You can use
+  /// e.g. [TextStyle.fontSize] as-is.
+  ///
+  /// [maxWidth] is the width in pixels that the rendered image is allowed to
+  /// take up. When [maxWidth] is [double.infinity] or [displayMode] is true,
+  /// the width will be the natural width of the text. Only when [displayMode]
+  /// is false and [maxWidth] is finite, this width determines where the text
+  /// will wrap.
   static Future<Uint8List> render(
     String text, {
     @required String requestId,
@@ -35,6 +57,9 @@ class FlutterTexJs {
     });
   }
 
+  /// Cancel the in-flight [render] request identified by [requestId]. You might
+  /// want to call this e.g. in StatefulWidget.dispose. It is safe to call this
+  /// even if no such render request exists.
   static Future<void> cancel(String requestId) {
     assert(requestId != null);
     return _channel.invokeMethod<void>('cancel', {
@@ -81,6 +106,8 @@ const Set<String> flutterTexJsSupportedEnvironments = {
 typedef ErrorWidgetBuilder = Widget Function(
     BuildContext context, Object error);
 
+/// A rendered image of LaTeX markup. The image is rendered asynchronously by a
+/// native web view.
 class TexImage extends StatefulWidget {
   const TexImage(
     this.math, {
@@ -95,12 +122,33 @@ class TexImage extends StatefulWidget {
         assert(displayMode != null),
         super(key: key);
 
+  /// LaTeX markup to render. See here for supported syntax:
+  /// https://katex.org/docs/supported.html
   final String math;
+
+  /// [displayMode] is KaTeX's displayMode: math will be in display mode (\int,
+  /// \sum, etc. will be large). This is appropriate for "block" display, as
+  /// opposed to "inline" display. See also: https://katex.org/docs/options.html
   final bool displayMode;
+
+  /// [color] is the color of the rendered text.
   final Color color;
+
+  /// [fontSize] is the size in pixels of the rendered text. You can use
+  /// e.g. [TextStyle.fontSize] as-is.
   final double fontSize;
+
+  /// A widget to display while rendering. By default it is simply [math] as
+  /// text.
   final Widget placeholder;
+
+  /// A builder supplying a widget to display in case of error, for instance
+  /// when [math] contains invalid or unsupported LaTeX syntax. By default it is
+  /// [Icons.error] and the error message.
   final ErrorWidgetBuilder error;
+
+  /// Whether or not the rendered image should be retained even when e.g. the
+  /// widget has been scrolled out of view in a [ListView].
   final bool keepAlive;
 
   @override
