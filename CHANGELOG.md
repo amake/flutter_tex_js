@@ -1,3 +1,7 @@
+## 0.1.2+1
+
+* Add dartdoc comments
+
 ## 0.1.2
 
 * Include KaTeX license
