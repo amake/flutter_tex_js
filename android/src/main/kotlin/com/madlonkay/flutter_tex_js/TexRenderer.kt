@@ -17,9 +17,10 @@ import kotlin.math.roundToInt
 private const val html =
 """
 <!DOCTYPE html>
-<html>
+<html id="root">
     <head>
-        <meta name="viewport" content="width=device-width">
+        <!-- Viewport settings perhaps not needed on Android -->
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1">
         <link rel="stylesheet" href="katex/katex.min.css">
         <script src="katex/katex.min.js"></script>
         <style type="text/css">
@@ -59,6 +60,9 @@ private const val html =
      function setNoWrap(noWrap) {
          getContainer().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
      }
+     function setWidth(width) {
+         document.getElementById('root').style.width = width;
+     }
      function sendError(error) {
          TexRenderer.onError(error.toString());
      }
@@ -88,8 +92,8 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
         WebView(context).apply {
             settings.javaScriptEnabled = true
             addJavascriptInterface(this@TexRenderer, "TexRenderer")
-            val metrics = context.resources.displayMetrics
-            layout(0, 0, metrics.widthPixels, metrics.heightPixels)
+            // Size cannot be 0x0, but 1x1 works
+            layout(0, 0, 1, 1)
             setBackgroundColor(Color.TRANSPARENT)
         }
     }
@@ -166,25 +170,17 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
                 return@whenReady
             }
             resultListener = completionHandler
-            val js = "setNoWrap(${maxWidth.isInfinite()}); setColor('$color'); setFontSize('${fontSize}px'); render('$math', $displayMode);"
+            val noWrap = maxWidth.isInfinite()
+            val newWidth = if (noWrap) {
+                "unset"
+            } else {
+                "${maxWidth}px"
+            }
+            val js = "setNoWrap($noWrap); setWidth('$newWidth'); setColor('$color'); setFontSize('${fontSize}px'); render('$math', $displayMode);"
             Log.d("AMK", "Executing JavaScript: $js")
-            setViewWidth(maxWidth)
             // We call loadUrl instead of evaluateJavascript for backwards compatibility, and
             // because we can't really make use of the immediately returned result
             webView.loadUrl("javascript:$js")
-        }
-    }
-
-    @MainThread
-    private fun setViewWidth(width: Double) {
-        val newWidth = if (width.isFinite()) {
-            (width * density).roundToInt()
-        } else {
-            context.resources.displayMetrics.widthPixels
-        }
-        if (webView.width != newWidth) {
-            Log.d("AMK", "New frame width: $newWidth; was ${webView.width}")
-            webView.layout(0, 0, newWidth, webView.height)
         }
     }
 }
