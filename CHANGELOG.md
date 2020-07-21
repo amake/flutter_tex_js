@@ -1,3 +1,7 @@
+## 0.1.3
+
+* Fix issues rendering after device rotation
+
 ## 0.1.2+1
 
 * Add dartdoc comments
