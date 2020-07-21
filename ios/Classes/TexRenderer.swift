@@ -13,9 +13,9 @@ fileprivate let assetsUrl = Bundle(for: TexRenderer.self).url(forResource: "flut
 
 fileprivate let html = """
 <!DOCTYPE html>
-<html>
+<html id="root">
     <head>
-        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1">
         <link rel="stylesheet" href="katex.min.css">
         <script src="katex.min.js"></script>
         <style type="text/css">
@@ -50,6 +50,9 @@ fileprivate let html = """
      }
      function setNoWrap(noWrap) {
          getContainer().style.whiteSpace = noWrap ? 'nowrap' : 'unset';
+     }
+     function setWidth(width) {
+         document.getElementById('root').style.width = width;
      }
      function getBounds() {
          return getContainer().getBoundingClientRect().toJSON();
@@ -91,7 +94,7 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
         let config = WKWebViewConfiguration()
         config.userContentController = controller
 
-        let webView = WKWebView(frame: UIScreen.main.bounds, configuration: config)
+        let webView = WKWebView(frame: .zero, configuration: config)
         webView.isOpaque = false
         return webView
     }
@@ -126,8 +129,14 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
                 return
             }
             self.busy = true
-            self.setFrameWidth(maxWidth)
-            let js = "setNoWrap(\(maxWidth.isInfinite)); setColor('\(color)'); setFontSize('\(fontSize)px'); render('\(math)', \(displayMode));"
+            let noWrap = maxWidth.isInfinite
+            let newWidth: String
+            if noWrap {
+                newWidth = "unset"
+            } else {
+                newWidth = "\(maxWidth)px"
+            }
+            let js = "setNoWrap(\(noWrap)); setWidth('\(newWidth)'); setColor('\(color)'); setFontSize('\(fontSize)px'); render('\(math)', \(displayMode));"
             log("Executing JavaScript: \(js)")
             self.webView.evaluateJavaScript(js) { [weak self] result, error in
                 guard let self = self else {
@@ -147,15 +156,6 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
                 }
                 self.busy = false
             }
-        }
-    }
-
-    private func setFrameWidth(_ newWidth: Double) {
-        let frameWidth = newWidth.isFinite ? newWidth : Double(UIScreen.main.bounds.width)
-        let newFrame = CGRect(x: 0, y: 0, width: Int(frameWidth.rounded(.down)), height: Int(webView.frame.height))
-        if webView.frame != newFrame {
-            log("New frame width: \(frameWidth); was \(webView.frame.width)")
-            webView.frame = newFrame
         }
     }
 
