@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tex_js/flutter_tex_js.dart';
-import 'package:flutter_tex_js_example/catex.dart';
-import 'package:flutter_tex_js_example/flutter_tex.dart';
+import 'package:flutter_tex_js_example/comparison/comparison.dart';
 
 void main() => runApp(const MyApp());
-
-const _tabs = [
-  Tab(child: Text('Edit')),
-  Tab(child: Text('∞')),
-  Tab(child: Text('Flutter TeX')),
-  Tab(child: Text('CaTeX')),
-];
 
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
@@ -20,37 +12,23 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      home: DefaultTabController(
-        length: _tabs.length,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Flutter TeX JS Example'),
-            bottom: const TabBar(
-              tabs: _tabs,
-            ),
-          ),
-          body: const TabBarView(
-            children: [
-              EditableExample(),
-              InfiniteExample(),
-              FlutterTexExample(),
-              CatexExample(),
-            ],
-          ),
-        ),
+      home: Scaffold(
+        appBar: AppBar(title: const Text('Flutter TeX JS Example')),
+        body: const _EditableExample(),
+        floatingActionButton: const _LaunchComparisonButton(),
       ),
     );
   }
 }
 
-class EditableExample extends StatefulWidget {
-  const EditableExample({Key key}) : super(key: key);
+class _EditableExample extends StatefulWidget {
+  const _EditableExample({Key key}) : super(key: key);
 
   @override
   _EditableExampleState createState() => _EditableExampleState();
 }
 
-class _EditableExampleState extends State<EditableExample> {
+class _EditableExampleState extends State<_EditableExample> {
   TextEditingController _textEditingController;
   bool _displayMode;
 
@@ -129,20 +107,13 @@ class _EditableExampleState extends State<EditableExample> {
   }
 }
 
-class InfiniteExample extends StatelessWidget {
-  const InfiniteExample({Key key}) : super(key: key);
-
+class _LaunchComparisonButton extends StatelessWidget {
+  const _LaunchComparisonButton({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemBuilder: (context, i) => Center(
-        child: TexImage(
-          '\\sqrt[$i]{a^2 + b^2} = ' * 5,
-          // No line wrap in displayMode
-          displayMode: false,
-          key: ValueKey(i),
-        ),
-      ),
+    return FloatingActionButton(
+      child: const Icon(Icons.all_inclusive),
+      onPressed: () => ComparisonPage.pushRoute(context),
     );
   }
 }
