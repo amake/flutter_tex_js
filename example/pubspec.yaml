@@ -15,6 +15,7 @@ dependencies:
 
   flutter_tex: ^3.6.7+5
   catex: ^0.0.1+2
+  libv_markdown: ^1.0.1
 
 dev_dependencies:
   flutter_test:

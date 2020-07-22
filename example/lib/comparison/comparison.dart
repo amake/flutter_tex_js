@@ -3,11 +3,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_tex_js_example/comparison/catex.dart';
 import 'package:flutter_tex_js_example/comparison/flutter_tex.dart';
 import 'package:flutter_tex_js_example/comparison/flutter_tex_js.dart';
+import 'package:flutter_tex_js_example/comparison/libv_markdown.dart';
 
 const _tabs = [
   Tab(child: Text('flutter_tex_js')),
   Tab(child: Text('flutter_tex')),
   Tab(child: Text('catex')),
+  Tab(child: Text('libv_markdown')),
 ];
 
 class ComparisonPage extends StatelessWidget {
@@ -36,6 +38,7 @@ class ComparisonPage extends StatelessWidget {
             FlutterTexJsExample(),
             FlutterTexExample(),
             CatexExample(),
+            LibvMarkdownExample(),
           ],
         ),
       ),
