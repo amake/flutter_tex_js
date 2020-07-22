@@ -64,11 +64,11 @@ class _EditableExampleState extends State<_EditableExample> {
         child: ListView(
           children: [
             TextField(controller: _textEditingController),
-            const SizedBox(height: 8),
-            Builder(
-              builder: (context) => Text(
-                  'Resolution: ${MediaQuery.of(context).devicePixelRatio}x'),
-            ),
+            // const SizedBox(height: 8),
+            // Builder(
+            //   builder: (context) => Text(
+            //       'Resolution: ${MediaQuery.of(context).devicePixelRatio}x'),
+            // ),
             const SizedBox(height: 8),
             CheckboxListTile(
               value: _displayMode,
