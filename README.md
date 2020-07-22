@@ -3,6 +3,12 @@
 A lightweight TeX plugin for Flutter based on [KaTeX](https://katex.org/), a
 popular and full-featured JavaScript TeX rendering library.
 
+<img width="300" src="https://pbs.twimg.com/media/EdiODWEVAAIZg9-?format=png&name=4096x4096">
+
+_flutter_tex_js used in [Orgro](https://orgro.org)_
+
+_See a [demo video](https://twitter.com/amadlonkay/status/1285937038840131584?s=20)_
+
 # What's different about this plugin?
 
 As of July 2020, there are several other TeX packages/plugins for Flutter, but
