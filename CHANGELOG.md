@@ -1,3 +1,7 @@
+## 0.1.3+1
+
+* Update documentation
+
 ## 0.1.3
 
 * Fix issues rendering after device rotation
