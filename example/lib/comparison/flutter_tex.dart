@@ -7,15 +7,16 @@ class FlutterTexExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: 10,
-      itemBuilder: (context, i) => Center(
-        child: TeXView(
-          renderingEngine: const TeXViewRenderingEngine.katex(),
-          child: TeXViewDocument(
-            _toTexRun('\\sqrt[$i]{a^2 + b^2} = ' * 5),
+      itemBuilder: (context, i) {
+        final math = '\\sqrt[$i]{a^2 + b^2} = ' * 5;
+        return Center(
+          child: TeXView(
+            renderingEngine: const TeXViewRenderingEngine.katex(),
+            child: TeXViewDocument(_toTexRun(math)),
+            loadingWidgetBuilder: (context) => Text(math),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
