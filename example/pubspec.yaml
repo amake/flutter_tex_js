@@ -16,6 +16,10 @@ dependencies:
   flutter_tex: ^3.6.7+5
   catex: ^0.0.1+2
   libv_markdown: ^1.0.1
+  # flutter_math is not compatible with Flutter SDK 1.18+
+  # flutter_math: ^0.1.3
+  # fluttex does not support iOS
+  # fluttex: ^0.0.2
 
 dev_dependencies:
   flutter_test:
