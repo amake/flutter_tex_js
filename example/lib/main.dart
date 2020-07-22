@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tex_js/flutter_tex_js.dart';
 import 'package:flutter_tex_js_example/comparison/comparison.dart';
@@ -31,6 +33,7 @@ class _EditableExample extends StatefulWidget {
 class _EditableExampleState extends State<_EditableExample> {
   TextEditingController _textEditingController;
   bool _displayMode;
+  double _fontSize;
 
   @override
   void initState() {
@@ -39,6 +42,12 @@ class _EditableExampleState extends State<_EditableExample> {
       text: r'a=\pm\sqrt{b^2+c^2} \int_\infty^\beta d\gamma',
     );
     _displayMode = true;
+  }
+
+  @override
+  void didChangeDependencies() {
+    _fontSize = DefaultTextStyle.of(context).style.fontSize;
+    super.didChangeDependencies();
   }
 
   @override
@@ -66,6 +75,25 @@ class _EditableExampleState extends State<_EditableExample> {
               onChanged: (value) => setState(() => _displayMode = value),
               title: const Text('Display mode'),
             ),
+            ListTile(
+              title: const Text('Font size'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('$_fontSize px',
+                      style: const TextStyle(
+                          fontFeatures: [FontFeature.tabularFigures()])),
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: () => setState(() => _fontSize--),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () => setState(() => _fontSize++),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 8),
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: _textEditingController,
@@ -76,6 +104,7 @@ class _EditableExampleState extends State<_EditableExample> {
                     child: TexImage(
                       value.text,
                       displayMode: _displayMode,
+                      fontSize: _fontSize,
                     ),
                   ),
                 );
@@ -91,6 +120,7 @@ class _EditableExampleState extends State<_EditableExample> {
                 child: TexImage(
                   [value.text, value.text, value.text].join(' '),
                   displayMode: _displayMode,
+                  fontSize: _fontSize,
                 ),
               ),
             ),
