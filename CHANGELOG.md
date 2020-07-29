@@ -1,3 +1,7 @@
+## 0.1.4
+
+* Fix Android webview debug enabled in release builds
+
 ## 0.1.3+1
 
 * Update documentation
