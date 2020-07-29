@@ -106,7 +106,7 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
         if (ready) {
             completionHandler()
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 WebView.setWebContentsDebuggingEnabled(true)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
