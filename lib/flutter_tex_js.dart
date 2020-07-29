@@ -159,6 +159,7 @@ class _TexImageState extends State<TexImage>
     with AutomaticKeepAliveClientMixin<TexImage> {
   String get id =>
       widget.key?.hashCode?.toString() ?? identityHashCode(this).toString();
+  Uint8List data;
 
   @override
   void dispose() {
@@ -171,6 +172,13 @@ class _TexImageState extends State<TexImage>
     super.build(context);
     return LayoutBuilder(
       builder: (context, constraints) {
+        if(data != null){
+          return Image.memory(
+            data,
+            scale: MediaQuery.of(context).devicePixelRatio,
+          );
+        }
+
         final textStyle = DefaultTextStyle.of(context).style;
         return FutureBuilder<Uint8List>(
           future: FlutterTexJs.render(
@@ -183,6 +191,7 @@ class _TexImageState extends State<TexImage>
           ),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              data = snapshot.data;
               return Image.memory(
                 snapshot.data,
                 scale: MediaQuery.of(context).devicePixelRatio,
