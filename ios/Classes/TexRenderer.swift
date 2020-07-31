@@ -162,8 +162,8 @@ class TexRenderer : NSObject, WKScriptMessageHandler {
     private func takeSnapshot(_ bbox: [String:Any], _ completionHandler: @escaping (Data?, Error?) -> Void) {
         let x = (bbox["left"] as! NSNumber).intValue
         let y = (bbox["top"] as! NSNumber).intValue
-        let w = (bbox["width"] as! NSNumber).intValue
-        let h = (bbox["height"] as! NSNumber).intValue
+        let w = max((bbox["width"] as! NSNumber).intValue, 1)
+        let h = max((bbox["height"] as! NSNumber).intValue, 1)
         let rect = CGRect(x: x, y: y, width: w, height: h)
         log("Taking snapshot of \(rect)")
 

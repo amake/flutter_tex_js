@@ -12,6 +12,7 @@ import android.webkit.WebView
 import androidx.annotation.MainThread
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 private const val html =
@@ -143,8 +144,8 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
     fun takeSnapshot(x: Double, y: Double, width: Double, height: Double) {
         val xPx = (x * density).roundToInt()
         val yPx = (y * density).roundToInt()
-        val widthPx = (width * density).roundToInt()
-        val heightPx = (height * density).roundToInt()
+        val widthPx = max((width * density).roundToInt(), 1)
+        val heightPx = max((height * density).roundToInt(), 1)
         Log.d("AMK", "Taking snapshot of [$x, $y, $width, $height], scaled to [$xPx, $yPx, $widthPx, $heightPx]")
         var bitmap = Bitmap.createBitmap(xPx + widthPx, yPx + heightPx, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
