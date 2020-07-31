@@ -34,6 +34,7 @@ class _EditableExampleState extends State<_EditableExample> {
   TextEditingController _textEditingController;
   bool _displayMode;
   double _fontSize;
+  Alignment _alignment;
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _EditableExampleState extends State<_EditableExample> {
       text: r'a=\pm\sqrt{b^2+c^2} \int_\infty^\beta d\gamma',
     );
     _displayMode = true;
+    _alignment = Alignment.center;
   }
 
   @override
@@ -64,41 +66,25 @@ class _EditableExampleState extends State<_EditableExample> {
         child: ListView(
           children: [
             TextField(controller: _textEditingController),
-            // const SizedBox(height: 8),
-            // Builder(
-            //   builder: (context) => Text(
-            //       'Resolution: ${MediaQuery.of(context).devicePixelRatio}x'),
-            // ),
             const SizedBox(height: 8),
-            CheckboxListTile(
+            _DisplayModeListTile(
               value: _displayMode,
               onChanged: (value) => setState(() => _displayMode = value),
-              title: const Text('Display mode'),
             ),
-            ListTile(
-              title: const Text('Font size'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('$_fontSize px',
-                      style: const TextStyle(
-                          fontFeatures: [FontFeature.tabularFigures()])),
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    onPressed: () => setState(() => _fontSize--),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () => setState(() => _fontSize++),
-                  ),
-                ],
-              ),
+            _FontSizeListTile(
+              value: _fontSize,
+              onChanged: (value) => setState(() => _fontSize = value),
+            ),
+            _AlignmentListTile(
+              onChanged: (value) => setState(() => _alignment = value),
             ),
             const SizedBox(height: 8),
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: _textEditingController,
               builder: (context, value, child) {
-                return Center(
+                return AnimatedAlign(
+                  duration: const Duration(seconds: 1),
+                  alignment: _alignment,
                   child: ColoredBox(
                     color: Colors.amber,
                     child: TexImage(
@@ -129,7 +115,7 @@ class _EditableExampleState extends State<_EditableExample> {
                 'fin',
                 style: TextStyle(fontStyle: FontStyle.italic),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -144,6 +130,89 @@ class _LaunchComparisonButton extends StatelessWidget {
     return FloatingActionButton(
       child: const Icon(Icons.all_inclusive),
       onPressed: () => ComparisonPage.pushRoute(context),
+    );
+  }
+}
+
+class _DisplayModeListTile extends StatelessWidget {
+  const _DisplayModeListTile(
+      {@required this.value, @required this.onChanged, Key key})
+      : super(key: key);
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile(
+      value: value,
+      onChanged: onChanged,
+      title: const Text('Display mode'),
+    );
+  }
+}
+
+class _FontSizeListTile extends StatelessWidget {
+  const _FontSizeListTile({
+    @required this.value,
+    @required this.onChanged,
+    Key key,
+  }) : super(key: key);
+
+  final double value;
+  final ValueChanged<double> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: const Text('Font size'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('$value px',
+              style: const TextStyle(
+                  fontFeatures: [FontFeature.tabularFigures()])),
+          IconButton(
+            icon: const Icon(Icons.remove),
+            onPressed: () => onChanged(value - 1),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => onChanged(value + 1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AlignmentListTile extends StatelessWidget {
+  const _AlignmentListTile({@required this.onChanged, Key key})
+      : super(key: key);
+
+  final ValueChanged<Alignment> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: const Text('Animate'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_left),
+            onPressed: () => onChanged(Alignment.centerLeft),
+          ),
+          IconButton(
+            icon: const Icon(Icons.adjust),
+            onPressed: () => onChanged(Alignment.center),
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_right),
+            onPressed: () => onChanged(Alignment.centerRight),
+          )
+        ],
+      ),
     );
   }
 }
