@@ -38,7 +38,7 @@ class FlutterTexJs {
     @required double fontSize,
     @required double maxWidth,
   }) async {
-    assert(text != null && text.isNotEmpty);
+    assert(text != null && text.trim().isNotEmpty);
     assert(requestId != null);
     assert(displayMode != null);
     assert(color != null);
@@ -213,7 +213,7 @@ class _TexImageState extends State<TexImage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (widget.math.isEmpty) {
+    if (widget.math.trim().isEmpty) {
       return Text(widget.math);
     }
     return LayoutBuilder(
