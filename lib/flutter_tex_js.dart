@@ -161,10 +161,53 @@ class _TexImageState extends State<TexImage>
   String get id =>
       widget.key?.hashCode?.toString() ?? identityHashCode(this).toString();
 
+  Future<Uint8List> _renderFuture;
+  List _renderArgs;
+
   @override
   void dispose() {
     FlutterTexJs.cancel(id);
     super.dispose();
+  }
+
+  // Memoize the Future object to prevent spurious re-renders, in particular
+  // this loop:
+  //
+  // 1. Initial render
+  // 2. Display of rendered image changes the layout, causing LayoutBuilder to
+  //    run again, causing another render
+  //
+  // An optimization in Flutter 1.18 (not yet "stable" as of July 2020)
+  // partially mitigates this, preventing an infinite loop but still
+  // re-rendering unnecessarily once.
+  //
+  // See also:
+  //
+  //  * https://github.com/flutter/flutter/wiki/Changelog#v118x
+  //  * https://github.com/amake/flutter_tex_js/pull/1
+  Future<Uint8List> _buildRenderFuture(
+    String math, {
+    @required String requestId,
+    @required bool displayMode,
+    @required Color color,
+    @required double fontSize,
+    @required double maxWidth,
+  }) {
+    final args = [math, requestId, displayMode, color, fontSize, maxWidth];
+    if (_renderFuture == null || !listEquals<dynamic>(args, _renderArgs)) {
+      _renderFuture = FlutterTexJs.render(
+        math,
+        requestId: requestId,
+        displayMode: displayMode,
+        color: color,
+        fontSize: fontSize,
+        maxWidth: maxWidth,
+      );
+      _renderArgs = args;
+    } else {
+      debugPrint('Skipping unnecessary render of $requestId');
+    }
+    return _renderFuture;
   }
 
   @override
@@ -177,7 +220,7 @@ class _TexImageState extends State<TexImage>
       builder: (context, constraints) {
         final textStyle = DefaultTextStyle.of(context).style;
         return FutureBuilder<Uint8List>(
-          future: FlutterTexJs.render(
+          future: _buildRenderFuture(
             widget.math,
             requestId: id,
             displayMode: widget.displayMode,
