@@ -36,8 +36,18 @@ void main() {
 
   test('render', () async {
     expect(
+        () => FlutterTexJs.render(
+              '',
+              requestId: '',
+              color: Colors.black,
+              maxWidth: double.infinity,
+              fontSize: 12,
+              displayMode: true,
+            ),
+        throwsAssertionError);
+    expect(
         await FlutterTexJs.render(
-          '',
+          'x^2',
           requestId: '',
           color: Colors.black,
           maxWidth: double.infinity,
