@@ -69,16 +69,13 @@ class FlutterTexJs {
   }
 }
 
-final _unescapedBackslashPattern = RegExp(r'(?<!\\)(?:\\\\)*\\');
-final _unescapedAposPattern = RegExp(r"(?<!\\)(?:\\\\)*'");
-
 // Native layer will concatenate with apostrophes to form a JavaScript string
 // literal; prepare here for that.
 String _escapeForJavaScript(String string) => string
-    .replaceAll(_unescapedBackslashPattern, r'\\')
+    .replaceAll(r'\', r'\\')
     .replaceAll('\n', r'\n')
     .replaceAll('\r', r'\r')
-    .replaceAll(_unescapedAposPattern, r"\'");
+    .replaceAll("'", r"\'");
 
 String _colorToCss(Color color) =>
     'rgba(${color.red},${color.green},${color.blue},${color.opacity})';
