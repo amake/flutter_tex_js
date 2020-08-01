@@ -1,9 +1,15 @@
+## 0.1.6
+
+* Fix handling of \ and ' in LaTeX markup
+  ([#3](https://github.com/amake/flutter_tex_js/issues/3),
+  [#4](https://github.com/amake/flutter_tex_js/issues/4))
+
 ## 0.1.5
 
 * Fix spurious redraws especially conspicuous on Flutter <1.18
   ([#1](https://github.com/amake/flutter_tex_js/pull/1))
 * Fix handling of empty string
-  ([#2](https://github.com/amake/flutter_tex_js/pull/2))
+  ([#2](https://github.com/amake/flutter_tex_js/issues/2))
 
 ## 0.1.4
 
