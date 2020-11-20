@@ -5,6 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// Keep in sync with const of same name in text_style.dart
+const double _kDefaultFontSize = 14;
+// This is arbitrary
+const Color _kDefaultTextColor = Colors.black;
+
 class FlutterTexJs {
   static const MethodChannel _channel = MethodChannel('flutter_tex_js');
 
@@ -32,37 +37,32 @@ class FlutterTexJs {
   /// will wrap.
   static Future<Uint8List> render(
     String text, {
-    @required String requestId,
-    @required bool displayMode,
-    @required Color color,
-    @required double fontSize,
-    @required double maxWidth,
+    required String requestId,
+    required bool displayMode,
+    required Color color,
+    required double fontSize,
+    required double maxWidth,
   }) async {
-    assert(text != null && text.trim().isNotEmpty);
-    assert(requestId != null);
-    assert(displayMode != null);
-    assert(color != null);
-    assert(maxWidth != null);
+    assert(text.trim().isNotEmpty);
     final escapedText = _escapeForJavaScript(text);
     if (escapedText != text && !kReleaseMode) {
       debugPrint(
           'Escaped text to render; was: "$text"; escaped: "$escapedText"');
     }
-    return _channel.invokeMethod<Uint8List>('render', {
+    return await _channel.invokeMethod<Uint8List>('render', {
       'requestId': requestId,
       'text': escapedText,
       'displayMode': displayMode,
       'color': _colorToCss(color),
       'fontSize': fontSize,
       'maxWidth': maxWidth,
-    });
+    }) as Uint8List;
   }
 
   /// Cancel the in-flight [render] request identified by [requestId]. You might
   /// want to call this e.g. in StatefulWidget.dispose. It is safe to call this
   /// even if no such render request exists.
   static Future<void> cancel(String requestId) {
-    assert(requestId != null);
     return _channel.invokeMethod<void>('cancel', {
       'requestId': requestId,
     });
@@ -115,10 +115,8 @@ class TexImage extends StatefulWidget {
     this.placeholder,
     this.error,
     this.keepAlive = true,
-    Key key,
-  })  : assert(math != null),
-        assert(displayMode != null),
-        super(key: key);
+    Key? key,
+  }) : super(key: key);
 
   /// LaTeX markup to render. See here for supported syntax:
   /// https://katex.org/docs/supported.html
@@ -130,20 +128,20 @@ class TexImage extends StatefulWidget {
   final bool displayMode;
 
   /// [color] is the color of the rendered text.
-  final Color color;
+  final Color? color;
 
   /// [fontSize] is the size in pixels of the rendered text. You can use
   /// e.g. [TextStyle.fontSize] as-is.
-  final double fontSize;
+  final double? fontSize;
 
   /// A widget to display while rendering. By default it is simply [math] as
   /// text.
-  final Widget placeholder;
+  final Widget? placeholder;
 
   /// A builder supplying a widget to display in case of error, for instance
   /// when [math] contains invalid or unsupported LaTeX syntax. By default it is
   /// [Icons.error] and the error message.
-  final ErrorWidgetBuilder error;
+  final ErrorWidgetBuilder? error;
 
   /// Whether or not the rendered image should be retained even when e.g. the
   /// widget has been scrolled out of view in a [ListView].
@@ -156,10 +154,10 @@ class TexImage extends StatefulWidget {
 class _TexImageState extends State<TexImage>
     with AutomaticKeepAliveClientMixin<TexImage> {
   String get id =>
-      widget.key?.hashCode?.toString() ?? identityHashCode(this).toString();
+      widget.key?.hashCode.toString() ?? identityHashCode(this).toString();
 
-  Future<Uint8List> _renderFuture;
-  List _renderArgs;
+  Future<Uint8List?>? _renderFuture;
+  List? _renderArgs;
 
   @override
   void dispose() {
@@ -182,13 +180,13 @@ class _TexImageState extends State<TexImage>
   //
   //  * https://github.com/flutter/flutter/wiki/Changelog#v118x
   //  * https://github.com/amake/flutter_tex_js/pull/1
-  Future<Uint8List> _buildRenderFuture(
+  Future<Uint8List?> _buildRenderFuture(
     String math, {
-    @required String requestId,
-    @required bool displayMode,
-    @required Color color,
-    @required double fontSize,
-    @required double maxWidth,
+    required String requestId,
+    required bool displayMode,
+    required Color color,
+    required double fontSize,
+    required double maxWidth,
   }) {
     final args = [math, requestId, displayMode, color, fontSize, maxWidth];
     if (_renderFuture == null || !listEquals<dynamic>(args, _renderArgs)) {
@@ -204,7 +202,7 @@ class _TexImageState extends State<TexImage>
     } else {
       debugPrint('Skipping unnecessary render of $requestId');
     }
-    return _renderFuture;
+    return _renderFuture!;
   }
 
   @override
@@ -216,23 +214,24 @@ class _TexImageState extends State<TexImage>
     return LayoutBuilder(
       builder: (context, constraints) {
         final textStyle = DefaultTextStyle.of(context).style;
-        return FutureBuilder<Uint8List>(
+        return FutureBuilder<Uint8List?>(
           future: _buildRenderFuture(
             widget.math,
             requestId: id,
             displayMode: widget.displayMode,
-            color: widget.color ?? textStyle.color,
-            fontSize: widget.fontSize ?? textStyle.fontSize,
+            color: widget.color ?? textStyle.color ?? _kDefaultTextColor,
+            fontSize:
+                widget.fontSize ?? textStyle.fontSize ?? _kDefaultFontSize,
             maxWidth: constraints.maxWidth,
           ),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Image.memory(
-                snapshot.data,
+                snapshot.data!,
                 scale: MediaQuery.of(context).devicePixelRatio,
               );
             } else if (snapshot.hasError) {
-              return _buildErrorWidget(snapshot.error);
+              return _buildErrorWidget(snapshot.error!);
             } else {
               return widget.placeholder ?? Text(widget.math);
             }
