@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tex_js/flutter_tex_js.dart';
 
 class FlutterTexJsExample extends StatelessWidget {
-  const FlutterTexJsExample({Key key}) : super(key: key);
+  const FlutterTexJsExample({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

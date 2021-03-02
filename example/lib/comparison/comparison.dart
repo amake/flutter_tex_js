@@ -20,7 +20,7 @@ class ComparisonPage extends StatelessWidget {
         fullscreenDialog: true,
       ));
 
-  const ComparisonPage({Key key}) : super(key: key);
+  const ComparisonPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
