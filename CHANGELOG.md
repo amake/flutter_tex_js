@@ -1,3 +1,7 @@
+## 1.0.0
+
+* Migrate to non-nullable by default
+
 ## 0.1.6
 
 * Fix handling of \ and ' in LaTeX markup
