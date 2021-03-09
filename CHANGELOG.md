@@ -1,3 +1,7 @@
+## 1.1.0
+
+* Update KaTeX to 0.13.0
+
 ## 1.0.0
 
 * Migrate to non-nullable by default
