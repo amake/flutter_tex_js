@@ -115,6 +115,7 @@ class TexImage extends StatefulWidget {
     this.placeholder,
     this.error,
     this.keepAlive = true,
+    this.alignment = Alignment.center,
     Key? key,
   }) : super(key: key);
 
@@ -146,6 +147,9 @@ class TexImage extends StatefulWidget {
   /// Whether or not the rendered image should be retained even when e.g. the
   /// widget has been scrolled out of view in a [ListView].
   final bool keepAlive;
+
+  /// Controls the content alignment.
+  final AlignmentGeometry alignment;
 
   @override
   _TexImageState createState() => _TexImageState();
@@ -228,6 +232,7 @@ class _TexImageState extends State<TexImage>
             if (snapshot.hasData) {
               return Image.memory(
                 snapshot.data!,
+                alignment: widget.alignment,
                 scale: MediaQuery.of(context).devicePixelRatio,
               );
             } else if (snapshot.hasError) {
