@@ -114,6 +114,7 @@ class TexImage extends StatefulWidget {
     this.fontSize,
     this.placeholder,
     this.error,
+    this.alignment,
     this.keepAlive = true,
     Key? key,
   }) : super(key: key);
@@ -142,6 +143,10 @@ class TexImage extends StatefulWidget {
   /// when [math] contains invalid or unsupported LaTeX syntax. By default it is
   /// [Icons.error] and the error message.
   final ErrorWidgetBuilder? error;
+
+  /// Controls the alignment of the image within its bounding box; see
+  /// [Image.alignment].
+  final AlignmentGeometry? alignment;
 
   /// Whether or not the rendered image should be retained even when e.g. the
   /// widget has been scrolled out of view in a [ListView].
@@ -228,6 +233,7 @@ class _TexImageState extends State<TexImage>
             if (snapshot.hasData) {
               return Image.memory(
                 snapshot.data!,
+                alignment: widget.alignment,
                 scale: MediaQuery.of(context).devicePixelRatio,
               );
             } else if (snapshot.hasError) {
