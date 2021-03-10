@@ -1,3 +1,8 @@
+## 1.2.0
+
+* Allow specifying the alignment of the rendered image within its bounding box
+  ([#5](https://github.com/amake/flutter_tex_js/pull/5))
+
 ## 1.1.0
 
 * Update KaTeX to 0.13.0
