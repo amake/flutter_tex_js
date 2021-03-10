@@ -116,6 +116,10 @@ class _EditableExampleState extends State<_EditableExample> {
                 style: TextStyle(fontStyle: FontStyle.italic),
               ),
             ),
+            const SizedBox(height: 24),
+            const Center(child: Text('Long text')),
+            const SizedBox(height: 8),
+            const _LongTextExample(),
           ],
         ),
       ),
@@ -215,4 +219,106 @@ class _AlignmentListTile extends StatelessWidget {
       ),
     );
   }
+}
+
+// Text from https://en.wikipedia.org/wiki/Electric_field#Electric_potential
+class _LongTextExample extends StatelessWidget {
+  const _LongTextExample({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text.rich(
+            TextSpan(
+              text:
+                  "If a system is static, such that magnetic fields are not time-varying, then by Faraday's law, the electric field is curl-free. In this case, one can define an electric potential, that is, a function ",
+              children: [
+                WidgetSpan(child: TexImage(r'\Phi', displayMode: false)),
+                TextSpan(text: ' such that '),
+                WidgetSpan(
+                  child: TexImage(
+                    r'\mathbf{E} = -\nabla \Phi',
+                    displayMode: false,
+                  ),
+                ),
+                TextSpan(
+                  text:
+                      '. This is analogous to the gravitational potential. The difference between the electric potential at two points in space is called the potential difference (or voltage) between the two points.\n',
+                ),
+              ],
+            ),
+          ),
+          const Text.rich(
+            TextSpan(
+              text:
+                  'In general, however, the electric field cannot be described independently of the magnetic field. Given the magnetic vector potential, ',
+              children: [
+                TextSpan(
+                  text: 'A',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: ', defined so that '),
+                WidgetSpan(
+                  child: TexImage(
+                    r'\mathbf{B} = \nabla \times \mathbf{A}',
+                    displayMode: false,
+                  ),
+                ),
+                TextSpan(
+                  text: ', one can still define an electric potential ',
+                ),
+                WidgetSpan(child: TexImage(r'\Phi', displayMode: false)),
+                TextSpan(text: ' such that:')
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          const TexImage(
+            r'\mathbf{E} = - \nabla \Phi - \frac { \partial \mathbf{A} } { \partial t }',
+          ),
+          const SizedBox(height: 8),
+          const Text.rich(
+            TextSpan(
+              text: 'Where ',
+              children: [
+                WidgetSpan(child: TexImage(r'\Phi', displayMode: false)),
+                TextSpan(
+                  text: ' is the gradient of the electric potential and ',
+                ),
+                WidgetSpan(
+                  child: TexImage(
+                    r'\frac { \partial \mathbf{A} } { \partial t }',
+                    displayMode: false,
+                  ),
+                ),
+                TextSpan(
+                  text:
+                      ' is the partial derivative of A with respect to time.\n',
+                ),
+              ],
+            ),
+          ),
+          const Text(
+            "Faraday's law of induction can be recovered by taking the curl of that equation",
+          ),
+          const SizedBox(height: 8),
+          const TexImage(
+            r'\nabla \times \mathbf{E} = -\frac{\partial (\nabla \times \mathbf{A})} {\partial t}= -\frac{\partial \mathbf{B}} {\partial t}',
+          ),
+          const SizedBox(height: 8),
+          const Text.rich(
+            TextSpan(
+              text: 'which justifies, a posteriori, the previous form for ',
+              children: [
+                TextSpan(
+                  text: 'E',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: '.'),
+              ],
+            ),
+          ),
+        ],
+      );
 }
