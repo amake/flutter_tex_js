@@ -114,7 +114,7 @@ class TexImage extends StatefulWidget {
     this.fontSize,
     this.placeholder,
     this.error,
-    this.alignment,
+    this.alignment = Alignment.center,
     this.keepAlive = true,
     Key? key,
   }) : super(key: key);
@@ -146,7 +146,7 @@ class TexImage extends StatefulWidget {
 
   /// Controls the alignment of the image within its bounding box; see
   /// [Image.alignment].
-  final AlignmentGeometry? alignment;
+  final AlignmentGeometry alignment;
 
   /// Whether or not the rendered image should be retained even when e.g. the
   /// widget has been scrolled out of view in a [ListView].
