@@ -52,8 +52,8 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
-        cancel("onDetatchedFromEngine")
-        renderer.cancel("onDetatchedFromEngine")
+        cancel("onDetachedFromEngine")
+        renderer.cancel("onDetachedFromEngine")
     }
 
     private fun handleRender(call: MethodCall, result: Result) {
