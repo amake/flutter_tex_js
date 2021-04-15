@@ -1,3 +1,7 @@
+## 1.2.1
+
+* Update KaTeX to 0.13.2
+
 ## 1.2.0
 
 * Allow specifying the alignment of the rendered image within its bounding box
