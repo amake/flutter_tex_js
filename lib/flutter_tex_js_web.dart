@@ -11,7 +11,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 /// A web implementation of the FlutterTexJs plugin.
 class FlutterTexJsWeb {
   static void registerWith(Registrar registrar) {
-    final MethodChannel channel = MethodChannel(
+    final channel = MethodChannel(
       'flutter_tex_js',
       const StandardMethodCodec(),
       registrar,
@@ -31,7 +31,8 @@ class FlutterTexJsWeb {
       default:
         throw PlatformException(
           code: 'Unimplemented',
-          details: 'flutter_tex_js for web doesn\'t implement \'${call.method}\'',
+          details:
+              'flutter_tex_js for web doesn\'t implement \'${call.method}\'',
         );
     }
   }
