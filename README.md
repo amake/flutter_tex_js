@@ -27,6 +27,19 @@ the Dart world where the result is displayed as an image.
     iOS 9 and 10, the `TexImage` widget will simply show the supplied text
     as-is.
 
+# Setup
+
+## Android
+
+If your app uses Kotlin, make sure it is v1.3.60 or later (see
+`ext.kotlin_version` in your `build.gradle` file). The default is v1.3.50, but
+this has [known problems](https://github.com/amake/flutter_tex_js/issues/7), so
+if you have never updated your Kotlin version then please do so.
+
+## iOS
+
+No setup required.
+
 # Usage
 
 ```dart
