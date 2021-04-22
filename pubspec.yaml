@@ -5,10 +5,12 @@ homepage: https://github.com/amake/flutter_tex_js
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
-  flutter: ">=1.10.0"
+  flutter: ">=1.12.0"
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_web_plugins:
     sdk: flutter
 
 dev_dependencies:
@@ -24,3 +26,6 @@ flutter:
         pluginClass: FlutterTexJsPlugin
       ios:
         pluginClass: FlutterTexJsPlugin
+      web:
+        pluginClass: FlutterTexJsWeb
+        fileName: flutter_tex_js_web.dart
