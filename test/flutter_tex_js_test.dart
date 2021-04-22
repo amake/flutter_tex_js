@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_tex_js/flutter_tex_js.dart';
+import 'package:flutter_tex_js/src/method_channel.dart';
 
 // 1x1 transparent pixel generated with ImageMagick:
 //   convert -size 1x1 xc:transparent pixel.png
