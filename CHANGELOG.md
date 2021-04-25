@@ -1,3 +1,9 @@
+## 1.2.2
+
+* Update KaTeX to 0.13.3
+* Update `flutterTexJsSupportedEnvironments` constant
+* Document Kotlin version requirement (v1.3.60 or later) for Android
+
 ## 1.2.1
 
 * Update KaTeX to 0.13.2
