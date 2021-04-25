@@ -81,24 +81,39 @@ String _colorToCss(Color color) =>
     'rgba(${color.red},${color.green},${color.blue},${color.opacity})';
 
 /// A set listing the supported TeX environments; see
-/// https://katex.org/docs/supported.html#environments
+/// https://katex.org/docs/support_table.html
 const Set<String> flutterTexJsSupportedEnvironments = {
-  'matrix',
-  'pmatrix',
-  'vmatrix',
-  'Bmatrix',
+  'align',
+  'align*',
   'aligned',
-  'gathered',
-  'smallmatrix',
-  'array',
-  'bmatrix',
-  'Vmatrix',
+  'alignat',
+  'alignat*',
   'alignedat',
+  'array',
+  'Bmatrix',
+  'Bmatrix*',
+  'bmatrix',
+  'bmatrix*',
   'cases',
-  'rcases',
+  'CD',
   'darray',
   'dcases',
   'drcases',
+  'equation',
+  'equation*',
+  'gather',
+  'gathered',
+  'matrix',
+  'matrix*',
+  'pmatrix',
+  'pmatrix*',
+  'rcases',
+  'smallmatrix',
+  'split',
+  'Vmatrix',
+  'Vmatrix*',
+  'vmatrix',
+  'vmatrix*',
 };
 
 typedef ErrorWidgetBuilder = Widget Function(
