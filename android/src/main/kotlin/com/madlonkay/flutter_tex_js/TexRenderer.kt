@@ -27,6 +27,7 @@ private const val html =
         <style type="text/css">
          body { background: transparent; margin: 0; }
          .katex-display { margin: 0; }
+         .katex-html > .tag { position: unset !important; padding-left: 2em; }
          #math { float: left; }
         </style>
     </head>
