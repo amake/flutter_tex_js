@@ -1,3 +1,8 @@
+## 1.2.3
+
+* Fix tags overlapping main content
+  ([#8](https://github.com/amake/flutter_tex_js/issues/8))
+
 ## 1.2.2
 
 * Update KaTeX to 0.13.3
