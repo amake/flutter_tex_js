@@ -120,6 +120,10 @@ class _EditableExampleState extends State<_EditableExample> {
             const Center(child: Text('Long text')),
             const SizedBox(height: 8),
             const _LongTextExample(),
+            const SizedBox(height: 24),
+            const Center(child: Text('Environments')),
+            const SizedBox(height: 8),
+            const _EnvironmentsExample(),
           ],
         ),
       ),
@@ -321,4 +325,46 @@ class _LongTextExample extends StatelessWidget {
           ),
         ],
       );
+}
+
+class _EnvironmentsExample extends StatelessWidget {
+  const _EnvironmentsExample({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const TexImage(r'''\begin{equation}
+a = b + c
+\end{equation}'''),
+        const SizedBox(height: 8),
+        const TexImage(r'''\begin{Bmatrix}
+   a & b \\
+   c & d
+   \end{Bmatrix}'''),
+        const SizedBox(height: 8),
+        const TexImage(r'''\begin{cases}
+   a &\text{if } b \\
+   c &\text{if } d
+   \end{cases}'''),
+        const SizedBox(height: 8),
+        const TexImage(r'''\begin{CD}
+   A @>a>> B \\
+@VbVV @AAcA \\
+   C @= D
+   \end{CD}'''),
+        const SizedBox(height: 8),
+        const TexImage(r'''\begin{equation}
+\begin{split}
+   a &=b+c\\
+      &=e+f
+\end{split}
+\end{equation}'''),
+        const SizedBox(height: 8),
+        const TexImage(r'''\begin{Vmatrix}
+   a & b \\
+   c & d
+\end{Vmatrix}''')
+      ],
+    );
+  }
 }
