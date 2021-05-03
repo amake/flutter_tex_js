@@ -1,3 +1,7 @@
+## 1.2.4
+
+* Update KaTeX to 0.13.5
+
 ## 1.2.3
 
 * Fix tags overlapping main content
