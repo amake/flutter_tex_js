@@ -232,8 +232,8 @@ class _LongTextExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text.rich(
+        children: const [
+          Text.rich(
             TextSpan(
               text:
                   "If a system is static, such that magnetic fields are not time-varying, then by Faraday's law, the electric field is curl-free. In this case, one can define an electric potential, that is, a function ",
@@ -253,7 +253,7 @@ class _LongTextExample extends StatelessWidget {
               ],
             ),
           ),
-          const Text.rich(
+          Text.rich(
             TextSpan(
               text:
                   'In general, however, the electric field cannot be described independently of the magnetic field. Given the magnetic vector potential, ',
@@ -277,12 +277,12 @@ class _LongTextExample extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
-          const TexImage(
+          SizedBox(height: 8),
+          TexImage(
             r'\mathbf{E} = - \nabla \Phi - \frac { \partial \mathbf{A} } { \partial t }',
           ),
-          const SizedBox(height: 8),
-          const Text.rich(
+          SizedBox(height: 8),
+          Text.rich(
             TextSpan(
               text: 'Where ',
               children: [
@@ -303,15 +303,15 @@ class _LongTextExample extends StatelessWidget {
               ],
             ),
           ),
-          const Text(
+          Text(
             "Faraday's law of induction can be recovered by taking the curl of that equation",
           ),
-          const SizedBox(height: 8),
-          const TexImage(
+          SizedBox(height: 8),
+          TexImage(
             r'\nabla \times \mathbf{E} = -\frac{\partial (\nabla \times \mathbf{A})} {\partial t}= -\frac{\partial \mathbf{B}} {\partial t}',
           ),
-          const SizedBox(height: 8),
-          const Text.rich(
+          SizedBox(height: 8),
+          Text.rich(
             TextSpan(
               text: 'which justifies, a posteriori, the previous form for ',
               children: [
@@ -332,35 +332,35 @@ class _EnvironmentsExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        const TexImage(r'''\begin{equation}
+      children: const [
+        TexImage(r'''\begin{equation}
 a = b + c
 \end{equation}'''),
-        const SizedBox(height: 8),
-        const TexImage(r'''\begin{Bmatrix}
+        SizedBox(height: 8),
+        TexImage(r'''\begin{Bmatrix}
    a & b \\
    c & d
    \end{Bmatrix}'''),
-        const SizedBox(height: 8),
-        const TexImage(r'''\begin{cases}
+        SizedBox(height: 8),
+        TexImage(r'''\begin{cases}
    a &\text{if } b \\
    c &\text{if } d
    \end{cases}'''),
-        const SizedBox(height: 8),
-        const TexImage(r'''\begin{CD}
+        SizedBox(height: 8),
+        TexImage(r'''\begin{CD}
    A @>a>> B \\
 @VbVV @AAcA \\
    C @= D
    \end{CD}'''),
-        const SizedBox(height: 8),
-        const TexImage(r'''\begin{equation}
+        SizedBox(height: 8),
+        TexImage(r'''\begin{equation}
 \begin{split}
    a &=b+c\\
       &=e+f
 \end{split}
 \end{equation}'''),
-        const SizedBox(height: 8),
-        const TexImage(r'''\begin{Vmatrix}
+        SizedBox(height: 8),
+        TexImage(r'''\begin{Vmatrix}
    a & b \\
    c & d
 \end{Vmatrix}''')
