@@ -4,17 +4,19 @@ katex_url := https://github.com/KaTeX/KaTeX/releases/download/$(katex_version)/k
 katex_ios := ios/Assets/katex
 katex_android := android/src/main/assets/katex
 
+extract_katex_to = cd $(1); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
+
 .PHONY: assets
 assets: ## Download vendor assets
 assets: $(katex_ios) $(katex_android)
 
 $(katex_ios):
-	cd $(@D); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
+	$(call extract_katex_to,$(@D))
 # Fonts must be in root of bundle in order to be found by WebView
 	sed -i '' -e 's|fonts/||g' $(@)/katex.min.css
 
 $(katex_android):
-	cd $(@D); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
+	$(call extract_katex_to,$(@D))
 
 .PHONY: clobber
 clobber: ## Delete all vendor files
