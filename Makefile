@@ -1,8 +1,8 @@
 # Remember to update flutterTexJsSupportedEnvironments when upgrading
 katex_version := v0.15.2
 katex_url := https://github.com/KaTeX/KaTeX/releases/download/$(katex_version)/katex.tar.gz
-katex_ios := ios/Assets/katex
-katex_android := android/src/main/assets/katex
+katex_ios := flutter_tex_js_ios/ios/Assets/katex
+katex_android := flutter_tex_js_android/android/src/main/assets/katex
 
 extract_katex_to = cd $(1); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
 
