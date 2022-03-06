@@ -1,6 +1,7 @@
 ## 1.2.17
 
 * Migrate to federated architecture
+* Require Flutter 1.20.0+
 
 ## 1.2.16
 
