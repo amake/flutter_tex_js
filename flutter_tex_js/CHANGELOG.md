@@ -1,3 +1,7 @@
+## 1.2.17
+
+* Migrate to federated architecture
+
 ## 1.2.16
 
 * Update KaTeX to 0.15.2
