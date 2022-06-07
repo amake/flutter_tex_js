@@ -15,12 +15,10 @@ jobs:
     - uses: actions/checkout@v2
     - uses: subosito/flutter-action@v1
       with:
-        channel: 'stable'
+        channel: 'beta'
     - name: Install dependencies
-      run: for d in flutter_tex_js*; do (cd $d && flutter pub get); done
+      run: make deps
     - name: Analyze
-      run: flutter analyze
+      run: make analyze
     - name: Run tests
-      run: cd flutter_tex_js && flutter test
-    - name: Check example
-      run: cd flutter_tex_js/example && flutter test
+      run: make test

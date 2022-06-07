@@ -6,6 +6,18 @@ katex_android := flutter_tex_js_android/android/src/main/assets/katex
 
 extract_katex_to = cd $(1); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
 
+.PHONY: deps
+deps: ## Fetch deps in all subprojects
+	for p in flutter_tex_js*; do (cd $$p && flutter pub get); done
+
+.PHONY: analyze
+analyze: ## Run analysis in all subprojects
+	flutter analyze flutter_tex_js*
+
+.PHONY: test
+test: ## Run tests in all subprojects
+	for t in flutter_tex_js*/test flutter_tex_js*/*/test; do (cd $$t/.. && flutter test); done
+
 .PHONY: assets
 assets: ## Download vendor assets
 assets: $(katex_ios) $(katex_android)
