@@ -166,7 +166,7 @@ class TexImage extends StatefulWidget {
   final bool keepAlive;
 
   @override
-  _TexImageState createState() => _TexImageState();
+  State<TexImage> createState() => _TexImageState();
 }
 
 class _TexImageState extends State<TexImage>
