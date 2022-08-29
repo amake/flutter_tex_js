@@ -12,6 +12,14 @@ do_all_projects = for p in flutter_tex_js*; do (cd $$p && $(1)); done
 deps: ## Fetch deps in all subprojects
 	$(call do_all_projects,flutter pub get $(args))
 
+.PHONY: outdated
+outdated: ## Check outdated deps in all subprojects
+	$(call do_all_projects,flutter pub outdated $(args))
+
+.PHONY: upgrade
+upgrade: ## Upgrade deps in all subprojects
+	$(call do_all_projects,flutter pub upgrade $(args))
+
 .PHONY: analyze
 analyze: ## Run analysis in all subprojects
 	flutter analyze flutter_tex_js*
