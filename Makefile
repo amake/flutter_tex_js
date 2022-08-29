@@ -6,9 +6,11 @@ katex_android := flutter_tex_js_android/android/src/main/assets/katex
 
 extract_katex_to = cd $(1); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
 
+do_all_projects = for p in flutter_tex_js*; do (cd $$p && $(1)); done
+
 .PHONY: deps
 deps: ## Fetch deps in all subprojects
-	for p in flutter_tex_js*; do (cd $$p && flutter pub get); done
+	$(call do_all_projects,flutter pub get $(args))
 
 .PHONY: analyze
 analyze: ## Run analysis in all subprojects
