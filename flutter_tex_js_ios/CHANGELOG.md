@@ -17,5 +17,4 @@
 * Update KaTeX to 0.15.3
 
 ## 1.0.0
-
 * Initial release
