@@ -8,7 +8,6 @@
 import Foundation
 import WebKit
 
-@available(iOS 11.0, *)
 fileprivate let assetsUrl = Bundle(for: TexRenderer.self).url(forResource: "flutter_tex_js_katex", withExtension: "bundle")!
 
 fileprivate let html = """
@@ -79,7 +78,6 @@ enum TexError : Error {
     case concurrentRequest
 }
 
-@available(iOS 11.0, *)
 class TexRenderer : NSObject, WKScriptMessageHandler {
 
     lazy var webView = initWebView()
