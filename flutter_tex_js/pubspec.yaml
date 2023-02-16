@@ -13,7 +13,7 @@ dependencies:
   flutter_tex_js_android: ^1.0.0
   # flutter_tex_js_android:
   #   path: ../flutter_tex_js_android
-  flutter_tex_js_ios: ^1.0.0
+  flutter_tex_js_ios: ^2.0.0
   # flutter_tex_js_ios:
   #   path: ../flutter_tex_js_ios
   flutter_tex_js_platform_interface: ^1.0.0
