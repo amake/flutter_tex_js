@@ -1,3 +1,6 @@
+## 2.0.0
+* Require iOS 11.0+
+
 ## 1.2.17
 
 * Migrate to federated architecture
