@@ -1,3 +1,6 @@
+## 2.0.1
+* Update KaTeX to 0.16.6
+
 ## 2.0.0
 * Require iOS 11.0+
 
