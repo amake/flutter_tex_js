@@ -103,17 +103,20 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
     private var readyListener: (suspend () -> Unit)? = null
     private var resultListener: ((ByteArray?, TexRenderError?) -> Unit)? = null
 
+    init {
+        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            WebView.enableSlowWholeDocumentDraw()
+        }
+    }
+
     @MainThread
     private suspend fun whenReady(completionHandler: suspend () -> Unit) = withContext(Dispatchers.Main) {
         if (ready) {
             completionHandler()
         } else {
-            if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                WebView.setWebContentsDebuggingEnabled(true)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                WebView.enableSlowWholeDocumentDraw()
-            }
             readyListener = completionHandler
             webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", null, null)
         }
