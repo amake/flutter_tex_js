@@ -1,3 +1,7 @@
+## 1.0.9
+* Attempt to fix erroneous render results in some circumstances
+  ([#12](https://github.com/amake/flutter_tex_js/issues/12))
+
 ## 1.0.8
 * Update KaTeX to 0.16.6
 
