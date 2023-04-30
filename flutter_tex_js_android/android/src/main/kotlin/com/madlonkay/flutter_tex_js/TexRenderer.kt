@@ -15,8 +15,7 @@ import java.io.ByteArrayOutputStream
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-private const val html =
-"""
+private const val html = """
 <!DOCTYPE html>
 <html id="root">
     <head>
@@ -46,7 +45,8 @@ private const val html =
              });
              // Returning immediately or setting 0 timeout here yielded bad results (incomplete
              // rendering, that weird zooming thing)
-             setTimeout(sendBounds, 100);
+             const now = Date.now();
+             setTimeout(function() { sendBounds(now); }, 100);
              return true;
          } catch (error) {
              sendError(error);
@@ -68,9 +68,9 @@ private const val html =
      function sendError(error) {
          TexRenderer.onError(error.toString());
      }
-     function sendBounds() {
+     function sendBounds(timestamp) {
          const bounds = getContainer().getBoundingClientRect();
-         TexRenderer.takeSnapshot(bounds.x, bounds.y, bounds.width, bounds.height);
+         TexRenderer.takeSnapshot(bounds.x, bounds.y, bounds.width, bounds.height, timestamp);
      }
      function loadAllFonts() {
          const fontLoadingPromises = [];
@@ -105,6 +105,8 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
     private var ready = false
     private var readyListener: (suspend () -> Unit)? = null
     private var resultListener: ((ByteArray?, TexRenderError?) -> Unit)? = null
+    private var previousJs: String? = null
+    private var previousBytes: ByteArray? = null
 
     init {
         if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -145,28 +147,53 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
             listener(null, err)
         }
         resultListener = null
+        previousJs = null
+        previousBytes = null
     }
 
     @JavascriptInterface
-    fun takeSnapshot(x: Double, y: Double, width: Double, height: Double) {
+    fun takeSnapshot(x: Double, y: Double, width: Double, height: Double, timestamp: Double) {
         val xPx = (x * density).roundToInt()
         val yPx = (y * density).roundToInt()
         val widthPx = max((width * density).roundToInt(), 1)
         val heightPx = max((height * density).roundToInt(), 1)
         Log.d("AMK", "Taking snapshot of [$x, $y, $width, $height], scaled to [$xPx, $yPx, $widthPx, $heightPx]")
-        var bitmap = Bitmap.createBitmap(xPx + widthPx, yPx + heightPx, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
         val listener = resultListener!!
         launch {
-            webView.draw(canvas)
-            if (xPx != 0 || yPx != 0) {
-                bitmap = Bitmap.createBitmap(bitmap, xPx, yPx, widthPx, heightPx)
+            var byteArray: ByteArray? = null
+            for (i in 0..100) {
+                byteArray = getSnapshotBytes(xPx, yPx, widthPx, heightPx)
+                if (byteArray.contentEquals(previousBytes)) {
+                    // Log.d("AMK", "bytes were the same! delaying")
+                    delay(50L)
+                } else {
+                    Log.d("AMK", "bytes look correct; took ${System.currentTimeMillis() - timestamp}ms over $i retries")
+                    break
+                }
             }
-            val bytes = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
-            listener.invoke(bytes.toByteArray(), null)
+            previousBytes = byteArray
+            listener.invoke(byteArray, null)
         }
         resultListener = null
+    }
+
+    private fun getSnapshotBytes(xPx: Int, yPx: Int, widthPx: Int, heightPx: Int): ByteArray {
+        // val start = System.currentTimeMillis()
+        val bitmap = Bitmap.createBitmap(xPx + widthPx, yPx + heightPx, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        webView.draw(canvas)
+        val clipped = if (xPx != 0 || yPx != 0) {
+            Bitmap.createBitmap(bitmap, xPx, yPx, widthPx, heightPx)
+        } else {
+            bitmap
+        }
+        val byteStream = ByteArrayOutputStream()
+        clipped.compress(Bitmap.CompressFormat.PNG, 100, byteStream)
+        val byteArray = byteStream.toByteArray()
+        bitmap.recycle()
+        clipped.recycle()
+        // Log.d("AMK", "generating bytes took ${System.currentTimeMillis() - start}ms")
+        return byteArray
     }
 
     @MainThread
@@ -177,7 +204,6 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
                 completionHandler(null, err)
                 return@whenReady
             }
-            resultListener = completionHandler
             val noWrap = maxWidth.isInfinite()
             val newWidth = if (noWrap) {
                 "unset"
@@ -186,9 +212,15 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
             }
             val js = "setNoWrap($noWrap); setWidth('$newWidth'); setColor('$color'); setFontSize('${fontSize}px'); render('$math', $displayMode);"
             Log.d("AMK", "Executing JavaScript: $js")
-            // We call loadUrl instead of evaluateJavascript for backwards compatibility, and
-            // because we can't really make use of the immediately returned result
-            webView.loadUrl("javascript:$js")
+            if (previousJs == js && previousBytes != null) {
+                completionHandler.invoke(previousBytes!!, null)
+            } else {
+                resultListener = completionHandler
+                previousJs = js
+                // We call loadUrl instead of evaluateJavascript for backwards compatibility, and
+                // because we can't really make use of the immediately returned result
+                webView.loadUrl("javascript:$js")
+            }
         }
     }
 }
