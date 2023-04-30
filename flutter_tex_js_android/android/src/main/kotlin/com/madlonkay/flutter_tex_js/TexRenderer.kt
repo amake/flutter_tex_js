@@ -97,6 +97,9 @@ class TexRenderer(private val context: Context) : CoroutineScope by MainScope() 
             // Size cannot be 0x0, but 1x1 works
             layout(0, 0, 1, 1)
             setBackgroundColor(Color.TRANSPARENT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false)
+            }
         }
     }
     private var ready = false
