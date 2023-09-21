@@ -1,3 +1,6 @@
+## 3.0.0
+* Drop older Android Gradle Plugin support
+
 ## 2.0.0
 * Require iOS 11.0+
 
