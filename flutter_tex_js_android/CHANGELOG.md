@@ -1,3 +1,7 @@
+## 2.0.0
+* Update KaTeX to 2.0.0
+* Move to Android Gradle Plugin 8
+
 ## 1.0.9
 * Attempt to fix erroneous render results in some circumstances
   ([#12](https://github.com/amake/flutter_tex_js/issues/12))
