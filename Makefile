@@ -4,7 +4,7 @@ katex_url := https://github.com/KaTeX/KaTeX/releases/download/$(katex_version)/k
 katex_ios := flutter_tex_js_ios/ios/Assets/katex
 katex_android := flutter_tex_js_android/android/src/main/assets/katex
 
-extract_katex_to = cd $(1); curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
+extract_katex_to = cd $(1) && curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
 
 do_all_projects = for p in flutter_tex_js*; do (cd $$p && $(1)); done
 
