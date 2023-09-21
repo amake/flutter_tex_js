@@ -17,21 +17,26 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    channel.setMockMethodCallHandler((methodCall) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (methodCall) async {
       switch (methodCall.method) {
         case 'render':
           return base64.decode(pixel);
         case 'cancel':
           return null;
         default:
-          assert(false,
-              'Unknown channel method called in test: ${methodCall.method}');
+          assert(
+            false,
+            'Unknown channel method called in test: ${methodCall.method}',
+          );
+          throw Exception();
       }
     });
   });
 
   tearDown(() {
-    channel.setMockMethodCallHandler(null);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
   });
 
   test('render', () async {

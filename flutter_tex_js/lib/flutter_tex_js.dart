@@ -175,7 +175,7 @@ class _TexImageState extends State<TexImage>
       widget.key?.hashCode.toString() ?? identityHashCode(this).toString();
 
   Future<Uint8List?>? _renderFuture;
-  List? _renderArgs;
+  List<dynamic>? _renderArgs;
 
   @override
   void dispose() {

@@ -230,9 +230,9 @@ class _LongTextExample extends StatelessWidget {
   const _LongTextExample({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) => const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text.rich(
             TextSpan(
               text:
@@ -331,8 +331,8 @@ class _EnvironmentsExample extends StatelessWidget {
   const _EnvironmentsExample({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: const [
+    return const Column(
+      children: [
         TexImage(r'''\begin{equation}
 a = b + c
 \end{equation}'''),
