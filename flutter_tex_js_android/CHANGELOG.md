@@ -1,3 +1,6 @@
+## 2.0.1
+* Update KaTeX to 0.16.9
+
 ## 2.0.0
 * Update KaTeX to 0.16.8
 * Move to Android Gradle Plugin 8
