@@ -25,7 +25,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace 'com.madlonkay.flutter_tex_js'
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.madlonkay.flutter_tex_js'
+    }
+
     compileSdk = 34
 
     compileOptions {
@@ -40,8 +43,9 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
     defaultConfig {
-        minSdkVersion 16
+        minSdk = 16
     }
 }
 
