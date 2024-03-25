@@ -1,14 +1,16 @@
 package com.madlonkay.flutter_tex_js
 
 import android.util.Log
-import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import java.util.concurrent.ConcurrentHashMap
 
@@ -19,13 +21,13 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
     private val jobManager = ConcurrentHashMap<String, Long>()
     private val mutex = Mutex()
 
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_tex_js")
         channel.setMethodCallHandler(this)
         renderer = TexRenderer(flutterPluginBinding.applicationContext)
     }
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "render" -> handleRender(call, result)
             "cancel" -> handleCancel(call, result)
@@ -33,7 +35,7 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
         }
     }
 
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
         cancel("onDetachedFromEngine")
         renderer.cancel("onDetachedFromEngine")
