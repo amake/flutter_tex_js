@@ -1,3 +1,8 @@
+## 2.1.0
+* Update KaTeX to 0.16.10
+* Update AndroidX Webkit to 1.10.0
+* Bump compile SDK to 34
+
 ## 2.0.1
 * Update KaTeX to 0.16.9
 
