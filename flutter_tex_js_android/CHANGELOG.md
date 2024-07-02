@@ -1,3 +1,6 @@
+## 2.1.1
+* Update KaTeX to 0.16.11
+
 ## 2.1.0
 * Update KaTeX to 0.16.10
 * Update AndroidX Webkit to 1.10.0
