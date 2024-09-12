@@ -64,6 +64,11 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
         log("New request: \(args)")
 
         let timestamp = NSDate().timeIntervalSinceReferenceDate
+        log("Queueing job \(requestId)")
+        let prev = jobManager.put(key: requestId, value: timestamp)
+        if prev != nil {
+            log("Replaced existing job \(requestId)")
+        }
 
         let isCancelled = { [weak self] () -> Bool in
             let queuedJob = self?.jobManager.get(requestId)
@@ -107,12 +112,6 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
                     self?.semaphore.signal()
                 }
             }
-        }
-
-        log("Queueing job \(requestId)")
-        let prev = jobManager.put(key: requestId, value: timestamp)
-        if prev != nil {
-            log("Replaced existing job \(requestId)")
         }
     }
 
