@@ -1,3 +1,6 @@
+## 2.0.6
+* Fixed an issue that could result in blank renderings in rare circumstances
+
 ## 2.0.5
 * Update KaTeX to 0.16.11
 
