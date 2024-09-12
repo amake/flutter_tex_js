@@ -1,3 +1,8 @@
+## 2.2.0
+* Update Kotlin Coroutine libraries to 1.7.1
+* Update AndroidX Webkit to 1.11.0
+* Fix build issue under apps using Gradle 8
+
 ## 2.1.1
 * Update KaTeX to 0.16.11
 
