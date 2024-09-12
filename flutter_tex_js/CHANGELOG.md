@@ -1,3 +1,7 @@
+## 4.0.0
+* Update Android plugin
+* Fix deprecations for Flutter 3.26
+
 ## 3.0.0
 * Drop older Android Gradle Plugin support
 
