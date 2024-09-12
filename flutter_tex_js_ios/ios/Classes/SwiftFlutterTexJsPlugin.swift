@@ -135,56 +135,44 @@ public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
 
 class ConcurrentDictionary<K: Hashable,V: Equatable> {
     var data: [K:V] = [:]
-    let queue = DispatchQueue(label: "ConcurrentDictionaryQueue")
-
-    private var readData: [K:V] {
-        var data: [K:V]!
-        queue.sync {
-            data = self.data
-        }
-        return data
-    }
+    let lock = NSLock()
 
     @discardableResult
     func put(key: K, value: V?) -> V? {
-        mapItem(key: key) { prev in
-            value
-        }
-    }
-
-    @discardableResult
-    func mapItem(key: K, block: @escaping (V?) -> V?) -> V? {
-        var previous: V?
-        queue.sync(flags: .barrier) {
-            previous = self.data[key]
-            self.data[key] = block(previous)
-        }
-        return previous
+        lock.lock()
+        defer { lock.unlock() }
+        let prev = data[key]
+        data[key] = value
+        return prev
     }
 
     @discardableResult
     func remove(_ key: K) -> V? {
-        return put(key: key, value: nil)
+        lock.lock()
+        defer { lock.unlock() }
+        return data.removeValue(forKey: key)
     }
 
     @discardableResult
     func remove(key: K, value: V?) -> Bool {
-        var removed = false
-        mapItem(key: key) { prev in
-            if prev == value {
-                removed = true
-                return nil
-            }
-            return prev
+        lock.lock()
+        defer { lock.unlock() }
+        if data[key] == value {
+            data.removeValue(forKey: key)
+            return true
         }
-        return removed
+        return false
     }
 
     func get(_ key: K) -> V? {
-        readData[key]
+        lock.lock()
+        defer { lock.unlock() }
+        return data[key]
     }
 
     var count: Int {
-        readData.count
+        lock.lock()
+        defer { lock.unlock() }
+        return data.count
     }
 }
