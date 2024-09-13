@@ -1,3 +1,6 @@
+## 4.0.1
+* Restore compatibility with Flutter 3.24
+
 ## 4.0.0
 * Update Android plugin
 * Fix deprecations for Flutter 3.26
