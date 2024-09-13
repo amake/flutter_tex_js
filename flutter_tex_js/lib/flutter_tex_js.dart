@@ -76,7 +76,7 @@ String _escapeForJavaScript(String string) => string
     .replaceAll("'", r"\'");
 
 String _colorToCss(Color color) =>
-    'rgb(${(color.r * 255).round()} ${(color.g * 255).round()} ${(color.b * 255).round()} / ${color.a})';
+    'rgba(${color.red},${color.green},${color.blue},${color.opacity})';
 
 /// A set listing the supported TeX environments; see
 /// https://katex.org/docs/support_table.html
