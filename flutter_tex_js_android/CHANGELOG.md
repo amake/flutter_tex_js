@@ -1,3 +1,7 @@
+## 3.0.1
+* Update KaTeX to 0.16.14
+* Increase padding to avoid truncated edges
+
 ## 3.0.0
 * Update Kotlin Coroutine libraries to 1.7.1
 * Update AndroidX Webkit to 1.11.0
