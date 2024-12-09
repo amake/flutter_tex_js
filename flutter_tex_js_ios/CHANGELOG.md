@@ -1,3 +1,7 @@
+## 2.0.7
+* Update KaTeX to 0.16.14
+* Increase padding to avoid truncated edges
+
 ## 2.0.6
 * Fixed an issue that could result in blank renderings in rare circumstances
 
