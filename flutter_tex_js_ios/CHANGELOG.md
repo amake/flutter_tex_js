@@ -1,3 +1,6 @@
+## 2.0.8
+* Update KaTeX to 0.16.15
+
 ## 2.0.7
 * Update KaTeX to 0.16.14
 * Increase padding to avoid truncated edges
