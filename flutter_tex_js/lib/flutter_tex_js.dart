@@ -76,7 +76,9 @@ String _escapeForJavaScript(String string) => string
     .replaceAll("'", r"\'");
 
 String _colorToCss(Color color) =>
-    'rgba(${color.red},${color.green},${color.blue},${color.opacity})';
+    'rgb(${_channelToInt(color.r)} ${_channelToInt(color.g)} ${_channelToInt(color.b)} / ${color.a})';
+
+int _channelToInt(double channel) => (channel * 255).round();
 
 /// A set listing the supported TeX environments; see
 /// https://katex.org/docs/support_table.html
