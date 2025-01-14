@@ -1,3 +1,6 @@
+## 5.0.0
+* Require Flutter 3.27+
+
 ## 4.0.1
 * Restore compatibility with Flutter 3.24
 
