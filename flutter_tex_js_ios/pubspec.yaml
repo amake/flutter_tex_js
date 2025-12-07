@@ -1,6 +1,6 @@
 name: flutter_tex_js_ios
 description: iOS implementation of the flutter_tex_js plugin.
-version: 2.0.14
+version: 2.0.15
 homepage: https://github.com/amake/flutter_tex_js
 
 environment:
