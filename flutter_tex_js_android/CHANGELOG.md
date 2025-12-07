@@ -1,3 +1,6 @@
+## 3.0.9
+* Update KaTeX to 0.16.27
+
 ## 3.0.8
 * Update KaTeX to 0.16.25
 
