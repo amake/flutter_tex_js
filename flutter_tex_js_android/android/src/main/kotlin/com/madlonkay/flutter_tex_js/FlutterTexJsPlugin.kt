@@ -88,6 +88,11 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
             cancelled
         }
 
+        val prev = jobManager.put(requestId, timestamp)
+        if (prev != null) {
+            Log.d("AMK", "Replaced existing job $requestId")
+        }
+
         launch(Dispatchers.Default) {
             Log.d("AMK", "Job $requestId waiting on thread ${Thread.currentThread()}")
             mutex.lock(requestId)
@@ -104,10 +109,6 @@ public class FlutterTexJsPlugin : FlutterPlugin, MethodCallHandler, CoroutineSco
                 jobManager.remove(requestId, timestamp)
                 mutex.unlock(requestId)
             }
-        }
-        val prev = jobManager.put(requestId, timestamp)
-        if (prev != null) {
-            Log.d("AMK", "Replaced existing job $requestId")
         }
     }
 
