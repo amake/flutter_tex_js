@@ -1,3 +1,6 @@
+## 3.0.11
+* Update KaTeX to 0.16.32
+
 ## 3.0.10
 * Update KaTeX to 0.16.28
 * Bug fix
