@@ -1,3 +1,6 @@
+## 2.0.24
+* Update KaTeX to 0.16.45
+
 ## 2.0.23
 * Update KaTeX to 0.16.44
 
