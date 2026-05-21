@@ -8,7 +8,34 @@
 import Foundation
 import WebKit
 
-fileprivate let assetsUrl = Bundle(for: TexRenderer.self).url(forResource: "flutter_tex_js_katex", withExtension: "bundle")!
+fileprivate let assetsUrl: URL = {
+    #if SWIFT_PACKAGE
+        let bundle = Bundle.module
+    #else
+        let bundle = Bundle(for: TexRenderer.self)
+    #endif
+
+    let fileManager = FileManager.default
+    let cocoaPodsResourceBundle = bundle
+        .url(forResource: "flutter_tex_js_katex", withExtension: "bundle")
+        .flatMap(Bundle.init(url:))
+    let candidateUrls = [
+        bundle.resourceURL?.appendingPathComponent("katex"),
+        bundle.url(forResource: "katex", withExtension: nil),
+        cocoaPodsResourceBundle?.resourceURL?.appendingPathComponent("katex"),
+        cocoaPodsResourceBundle?.resourceURL,
+        bundle.resourceURL,
+    ]
+
+    for candidateUrl in candidateUrls.compactMap({ $0 }) {
+        let katexCssUrl = candidateUrl.appendingPathComponent("katex.min.css")
+        if fileManager.fileExists(atPath: katexCssUrl.path) {
+            return candidateUrl
+        }
+    }
+
+    fatalError("Failed to locate KaTeX assets in the plugin bundle.")
+}()
 
 fileprivate let html = """
 <!DOCTYPE html>

@@ -7,10 +7,10 @@ func log(_ message: String) {
     #endif
 }
 
-public class SwiftFlutterTexJsPlugin: NSObject, FlutterPlugin {
+public class FlutterTexJsPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_tex_js", binaryMessenger: registrar.messenger())
-        let instance = SwiftFlutterTexJsPlugin()
+        let instance = FlutterTexJsPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 

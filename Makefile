@@ -1,7 +1,7 @@
 # Remember to update flutterTexJsSupportedEnvironments when upgrading
 katex_version := v0.16.45
 katex_url := https://github.com/KaTeX/KaTeX/releases/download/$(katex_version)/katex.tar.gz
-katex_ios := flutter_tex_js_ios/ios/Assets/katex
+katex_ios := flutter_tex_js_ios/ios/flutter_tex_js_ios/Sources/flutter_tex_js_ios/katex
 katex_android := flutter_tex_js_android/android/src/main/assets/katex
 
 extract_katex_to = cd $(1) && curl -L $(katex_url) | tar xz --include '*/katex.min.*' --include '*.woff2'
@@ -34,8 +34,6 @@ assets: $(katex_ios) $(katex_android)
 
 $(katex_ios):
 	$(call extract_katex_to,$(@D))
-# Fonts must be in root of bundle in order to be found by WebView
-	sed -i '' -e 's|fonts/||g' $(@)/katex.min.css
 
 $(katex_android):
 	$(call extract_katex_to,$(@D))

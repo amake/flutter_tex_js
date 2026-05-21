@@ -13,12 +13,13 @@ Pod::Spec.new do |s|
   s.license          = { file: '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { path: '.' }
-  s.source_files = 'Classes/**/*'
-  s.resource_bundle = { 'flutter_tex_js_katex' => 'Assets/katex/**/*.{min.js,min.css,woff2}' }
+  s.source_files = 'flutter_tex_js_ios/Sources/flutter_tex_js_ios/**/*.swift'
+  s.resource_bundles = { 'flutter_tex_js_katex' => [
+    'flutter_tex_js_ios/Sources/flutter_tex_js_ios/katex/*'
+  ] }
   s.dependency 'Flutter'
-  s.platform = :ios, '11.0'
+  s.platform = :ios, '12.0'
 
-  # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.swift_version = '5.0'
 end
