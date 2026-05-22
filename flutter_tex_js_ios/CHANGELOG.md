@@ -1,3 +1,7 @@
+## 2.1.0
+* Update KaTeX to 0.17.0
+* Support Swift Package Manager
+
 ## 2.0.24
 * Update KaTeX to 0.16.45
 
