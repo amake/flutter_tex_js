@@ -1,5 +1,5 @@
 # Remember to update flutterTexJsSupportedEnvironments when upgrading
-katex_version := v0.16.45
+katex_version := v0.17.0
 katex_url := https://github.com/KaTeX/KaTeX/releases/download/$(katex_version)/katex.tar.gz
 katex_ios := flutter_tex_js_ios/ios/flutter_tex_js_ios/Sources/flutter_tex_js_ios/katex
 katex_android := flutter_tex_js_android/android/src/main/assets/katex
