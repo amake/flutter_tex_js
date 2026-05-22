@@ -79,10 +79,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_tex_js_ios
-      sha256: "93653cabcd01d5d27ffe84ebfd2657f0e16cbd2e5fcabf7043ff18b6e031e965"
+      sha256: "179a234ef827fb31b00674f2b49d2c507c38a7fc17e4810c28318de238b46e6a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.24"
+    version: "2.1.0"
   flutter_tex_js_platform_interface:
     dependency: "direct main"
     description:
