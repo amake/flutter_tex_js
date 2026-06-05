@@ -1,6 +1,6 @@
 name: flutter_tex_js
 description: A lightweight TeX plugin that uses KaTeX (JavaScript) in a native web view to render to PNG
-version: 5.0.0
+version: 6.0.0
 homepage: https://github.com/amake/flutter_tex_js
 
 environment:
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_tex_js_android: ^3.0.0
+  flutter_tex_js_android: ^4.0.0
   # flutter_tex_js_android:
   #   path: ../flutter_tex_js_android
   flutter_tex_js_ios: ^2.1.0
