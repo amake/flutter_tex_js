@@ -48,7 +48,7 @@ fileprivate let html = """
          body { background: transparent; margin: 0; }
          .katex-display { margin: 0; padding: 1px 0; }
          .katex-html > .katex-tag { position: unset !important; padding-left: 2em; }
-         #math { float: left; padding-top: 1px; padding-bottom: 1px; }
+         #math { float: left; padding: 1px; }
         </style>
     </head>
     <body>
