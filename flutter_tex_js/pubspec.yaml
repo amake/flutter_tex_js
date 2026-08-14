@@ -19,6 +19,7 @@ dependencies:
   flutter_tex_js_platform_interface: ^1.0.0
   # flutter_tex_js_platform_interface:
   #   path: ../flutter_tex_js_platform_interface
+  material_ui: ^1.0.0
 
 dev_dependencies:
   flutter_lints: ^6.0.0

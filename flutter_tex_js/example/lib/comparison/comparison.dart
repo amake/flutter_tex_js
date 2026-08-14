@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_tex_js_example/comparison/catex.dart';
 import 'package:flutter_tex_js_example/comparison/flutter_tex.dart';
 import 'package:flutter_tex_js_example/comparison/flutter_tex_js.dart';

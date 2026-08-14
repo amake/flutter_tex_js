@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_tex_js/flutter_tex_js.dart';
 import 'package:flutter_tex_js_example/comparison/comparison.dart';
 
