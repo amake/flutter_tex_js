@@ -47,7 +47,8 @@ class FlutterTexJs {
     final escapedText = _escapeForJavaScript(text);
     if (escapedText != text && !kReleaseMode) {
       debugPrint(
-          'Escaped text to render; was: "$text"; escaped: "$escapedText"');
+        'Escaped text to render; was: "$text"; escaped: "$escapedText"',
+      );
     }
     return await _platform.render(
       escapedText,
@@ -116,8 +117,8 @@ const Set<String> flutterTexJsSupportedEnvironments = {
   'vmatrix*',
 };
 
-typedef ErrorWidgetBuilder = Widget Function(
-    BuildContext context, Object error);
+typedef ErrorWidgetBuilder =
+    Widget Function(BuildContext context, Object error);
 
 /// A rendered image of LaTeX markup. The image is rendered asynchronously by a
 /// native web view.
@@ -131,8 +132,8 @@ class TexImage extends StatefulWidget {
     this.error,
     this.alignment = Alignment.center,
     this.keepAlive = true,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   /// LaTeX markup to render. See here for supported syntax:
   /// https://katex.org/docs/supported.html
@@ -275,12 +276,8 @@ class _TexImageState extends State<TexImage>
     return errorBuilder(context, error);
   }
 
-  Widget defaultError(BuildContext context, Object error) => Column(
-        children: [
-          const Icon(Icons.error),
-          Text(error.toString()),
-        ],
-      );
+  Widget defaultError(BuildContext context, Object error) =>
+      Column(children: [const Icon(Icons.error), Text(error.toString())]);
 
   @override
   bool get wantKeepAlive => widget.keepAlive;
