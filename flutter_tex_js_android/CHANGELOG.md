@@ -1,3 +1,6 @@
+## 4.0.4
+- Update KaTeX to 0.19.1
+
 ## 4.0.3
 - Update KaTeX to 0.18.9
 
